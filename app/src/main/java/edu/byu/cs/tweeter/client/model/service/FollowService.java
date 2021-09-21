@@ -17,14 +17,14 @@ import edu.byu.cs.tweeter.model.domain.User;
 public class FollowService
 {
 
-    public interface Observer
+    public interface GetFollowingObserver
     {
         void getFollowingSuccess(List<User> user, boolean hasMorePages, User lastFollowee);
         void getFollowingFailure(String message);
         void getFollowingException(Exception ex);
     }
 
-    public void getFollowing(AuthToken authToken, User target, int limit, User lastFollowee, Observer observer)
+    public void getFollowing(AuthToken authToken, User target, int limit, User lastFollowee, GetFollowingObserver observer)
     {
         GetFollowingTask getFollowingTask = new GetFollowingTask(authToken,
                 target, limit, lastFollowee, new GetFollowingHandler(observer));
@@ -38,9 +38,9 @@ public class FollowService
      */
     private class GetFollowingHandler extends Handler
     {
-        private Observer observer;
+        private GetFollowingObserver observer;
 
-        public GetFollowingHandler(Observer observer)
+        public GetFollowingHandler(GetFollowingObserver observer)
         {
             this.observer = observer;
         }
