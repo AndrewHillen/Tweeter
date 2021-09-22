@@ -7,7 +7,7 @@ import edu.byu.cs.tweeter.client.model.service.UserService;
 import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.User;
 
-public class FollowerPresenter implements FollowService.GetFollowerObserver, UserService.Observer
+public class FollowerPresenter implements FollowService.GetFollowerObserver, UserService.GetUserObserver
 {
 
     public interface View
@@ -21,7 +21,7 @@ public class FollowerPresenter implements FollowService.GetFollowerObserver, Use
 
     }
 
-    private FollowerPresenter.View view;
+    private View view;
     private AuthToken authToken;
     private User user;
     private User lastFollower;
@@ -31,7 +31,7 @@ public class FollowerPresenter implements FollowService.GetFollowerObserver, Use
 
     private static final int PAGE_SIZE = 10;
 
-    public FollowerPresenter(FollowerPresenter.View view, AuthToken authToken, User user)
+    public FollowerPresenter(View view, AuthToken authToken, User user)
     {
         this.view = view;
         this.authToken = authToken;
