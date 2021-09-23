@@ -15,8 +15,10 @@ import java.util.concurrent.Executors;
 import edu.byu.cs.tweeter.client.backgroundTask.GetUserTask;
 
 import edu.byu.cs.tweeter.client.backgroundTask.LoginTask;
+import edu.byu.cs.tweeter.client.backgroundTask.RegisterTask;
 import edu.byu.cs.tweeter.client.cache.Cache;
 import edu.byu.cs.tweeter.client.view.login.LoginFragment;
+import edu.byu.cs.tweeter.client.view.login.RegisterFragment;
 import edu.byu.cs.tweeter.client.view.main.MainActivity;
 import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.User;
@@ -118,4 +120,58 @@ public class UserService
             }
         }
     }
+
+
+    public interface RegisterObserver
+    {
+        void registerSuccess(User user, AuthToken authToken);
+        void registerFailure(String message);
+        void registerException(Exception ex);
+    }
+
+    public void register(String firstName, String lastName,
+                         String alias, String password,
+                         String imageBytesBase64, RegisterObserver observer)
+    {
+        RegisterTask registerTask = new RegisterTask(firstName, lastName,
+                alias, password, imageBytesBase64, new RegisterHandler(observer));
+
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.execute(registerTask);
+    }
+
+    // RegisterHandler
+
+    private class RegisterHandler extends Handler {
+
+        private RegisterObserver observer;
+
+        public RegisterHandler(RegisterObserver observer)
+        {
+            this.observer = observer;
+        }
+
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            boolean success = msg.getData().getBoolean(RegisterTask.SUCCESS_KEY);
+            if (success) {
+                User registeredUser = (User) msg.getData().getSerializable(RegisterTask.USER_KEY);
+                AuthToken authToken = (AuthToken) msg.getData().getSerializable(RegisterTask.AUTH_TOKEN_KEY);
+
+                observer.registerSuccess(registeredUser, authToken);
+            }
+            else if (msg.getData().containsKey(RegisterTask.MESSAGE_KEY))
+            {
+                String message = msg.getData().getString(RegisterTask.MESSAGE_KEY);
+                observer.registerFailure(message);
+            }
+            else if (msg.getData().containsKey(RegisterTask.EXCEPTION_KEY))
+            {
+                Exception ex = (Exception) msg.getData().getSerializable(RegisterTask.EXCEPTION_KEY);
+                observer.registerException(ex);
+            }
+        }
+    }
+
+
 }
