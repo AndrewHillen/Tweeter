@@ -10,9 +10,12 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import edu.byu.cs.tweeter.client.backgroundTask.FollowTask;
 import edu.byu.cs.tweeter.client.backgroundTask.GetFollowersTask;
 import edu.byu.cs.tweeter.client.backgroundTask.GetFollowingTask;
+import edu.byu.cs.tweeter.client.backgroundTask.UnfollowTask;
 import edu.byu.cs.tweeter.client.cache.Cache;
+import edu.byu.cs.tweeter.client.view.main.MainActivity;
 import edu.byu.cs.tweeter.client.view.main.followers.FollowersFragment;
 import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.User;
@@ -124,6 +127,96 @@ public class FollowService
             {
                 Exception ex = (Exception) msg.getData().getSerializable(GetFollowersTask.EXCEPTION_KEY);
                 observer.getFollowerException(ex);
+            }
+        }
+    }
+
+
+    public interface FollowObserver
+    {
+        void followSuccess();
+        void followFailure(String message);
+        void followException(Exception ex);
+    }
+
+    public void followUser(User user, AuthToken authToken, FollowObserver observer)
+    {
+        FollowTask followTask = new FollowTask(authToken,
+                user, new FollowHandler(observer));
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.execute(followTask);
+    }
+
+    // FollowHandler
+
+    private class FollowHandler extends Handler {
+
+        private FollowObserver observer;
+
+        public FollowHandler(FollowObserver observer)
+        {
+            this.observer = observer;
+        }
+
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            boolean success = msg.getData().getBoolean(FollowTask.SUCCESS_KEY);
+            if (success) {
+                observer.followSuccess();
+            }
+            else if (msg.getData().containsKey(FollowTask.MESSAGE_KEY))
+            {
+                String message = msg.getData().getString(FollowTask.MESSAGE_KEY);
+                observer.followFailure(message);
+            }
+            else if (msg.getData().containsKey(FollowTask.EXCEPTION_KEY))
+            {
+                Exception ex = (Exception) msg.getData().getSerializable(FollowTask.EXCEPTION_KEY);
+                observer.followException(ex);
+            }
+        }
+    }
+
+    public interface UnFollowObserver
+    {
+        void unFollowSuccess();
+        void unFollowFailure(String message);
+        void unFollowException(Exception ex);
+    }
+
+    public void unFollowUser(User user, AuthToken authToken, UnFollowObserver observer)
+    {
+        UnfollowTask unfollowTask = new UnfollowTask(authToken,
+                user, new UnfollowHandler(observer));
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.execute(unfollowTask);
+    }
+
+    // UnfollowHandler
+
+    private class UnfollowHandler extends Handler {
+        private UnFollowObserver observer;
+
+        public UnfollowHandler(UnFollowObserver observer)
+        {
+            this.observer = observer;
+        }
+
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            boolean success = msg.getData().getBoolean(UnfollowTask.SUCCESS_KEY);
+            if (success) {
+                observer.unFollowSuccess();
+            }
+            else if (msg.getData().containsKey(UnfollowTask.MESSAGE_KEY))
+            {
+                String message = msg.getData().getString(UnfollowTask.MESSAGE_KEY);
+                observer.unFollowFailure(message);
+            }
+            else if (msg.getData().containsKey(UnfollowTask.EXCEPTION_KEY))
+            {
+                Exception ex = (Exception) msg.getData().getSerializable(UnfollowTask.EXCEPTION_KEY);
+                observer.unFollowException(ex);
             }
         }
     }
