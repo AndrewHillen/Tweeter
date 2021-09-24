@@ -12,7 +12,9 @@ import java.util.concurrent.Executors;
 
 import edu.byu.cs.tweeter.client.backgroundTask.GetFeedTask;
 import edu.byu.cs.tweeter.client.backgroundTask.GetStoryTask;
+import edu.byu.cs.tweeter.client.backgroundTask.PostStatusTask;
 import edu.byu.cs.tweeter.client.cache.Cache;
+import edu.byu.cs.tweeter.client.view.main.MainActivity;
 import edu.byu.cs.tweeter.client.view.main.feed.FeedFragment;
 import edu.byu.cs.tweeter.client.view.main.story.StoryFragment;
 import edu.byu.cs.tweeter.model.domain.AuthToken;
@@ -121,6 +123,51 @@ public class StatusService
             {
                 Exception ex = (Exception) msg.getData().getSerializable(GetStoryTask.EXCEPTION_KEY);
                 observer.getStoryException(ex);
+            }
+        }
+    }
+
+    public interface PostStatusObserver
+    {
+        void postStatusSuccess();
+        void postStatusFailure(String message);
+        void postStatusException(Exception ex);
+    }
+
+    public void postStatus(AuthToken authToken, Status status, PostStatusObserver observer)
+    {
+        PostStatusTask statusTask = new PostStatusTask(authToken,
+                status, new PostStatusHandler(observer));
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.execute(statusTask);
+    }
+
+    // PostStatusHandler
+
+    private class PostStatusHandler extends Handler {
+
+        private PostStatusObserver observer;
+
+        public PostStatusHandler(PostStatusObserver observer)
+        {
+            this.observer = observer;
+        }
+
+        @Override
+        public void handleMessage(@NonNull Message msg) {
+            boolean success = msg.getData().getBoolean(PostStatusTask.SUCCESS_KEY);
+            if (success) {
+                observer.postStatusSuccess();
+            }
+            else if (msg.getData().containsKey(PostStatusTask.MESSAGE_KEY))
+            {
+                String message = msg.getData().getString(PostStatusTask.MESSAGE_KEY);
+                observer.postStatusFailure(message);
+            }
+            else if (msg.getData().containsKey(PostStatusTask.EXCEPTION_KEY))
+            {
+                Exception ex = (Exception) msg.getData().getSerializable(PostStatusTask.EXCEPTION_KEY);
+                observer.postStatusException(ex);
             }
         }
     }
