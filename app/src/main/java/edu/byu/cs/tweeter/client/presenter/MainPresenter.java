@@ -12,15 +12,105 @@ import edu.byu.cs.tweeter.client.cache.Cache;
 import edu.byu.cs.tweeter.client.model.service.FollowService;
 import edu.byu.cs.tweeter.client.model.service.StatusService;
 import edu.byu.cs.tweeter.client.model.service.UserService;
+import edu.byu.cs.tweeter.client.model.service.observer.SimpleNotificationObserver;
 import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.Status;
 import edu.byu.cs.tweeter.model.domain.User;
 
-public class MainPresenter implements UserService.LogoutObserver, FollowService.FollowObserver,
-        FollowService.UnFollowObserver, FollowService.CheckFollowObserver,
+public class MainPresenter implements UserService.LogoutObserver, /* FollowService.FollowObserver,
+        FollowService.UnFollowObserver, */FollowService.CheckFollowObserver,
         FollowService.FollowingCountObserver, FollowService.FollowerCountObserver,
         StatusService.PostStatusObserver
 {
+//    @Override
+//    public void handleFailure(String message)
+//    {
+//
+//    }
+//
+//    @Override
+//    public void handleException(Exception ex)
+//    {
+//
+//    }
+//
+//    @Override
+//    public void handleSuccess()
+//    {
+//
+//    }
+
+    public abstract class MainObserver implements SimpleNotificationObserver
+    {
+        @Override
+        public void handleSuccess()
+        {
+            specificSuccessImplementation();
+        }
+
+        @Override
+        public void handleFailure(String message)
+        {
+            specificFailureImplementation();
+            view.displayErrorMessage(message);
+        }
+
+        @Override
+        public void handleException(Exception ex)
+        {
+            specificExceptionImplementation();
+        }
+
+        public abstract void specificSuccessImplementation();
+        public void specificFailureImplementation() { return;}
+        public void specificExceptionImplementation() {return;}
+    }
+
+    private abstract class ChangeFollowObserver extends MainObserver implements FollowService.ChangeFollowObserver
+    {
+        @Override
+        public void specificSuccessImplementation()
+        {
+            view.enableFollowButton(true);
+            changeFollow();
+        }
+
+        @Override
+        public void specificFailureImplementation()
+        {
+            view.enableFollowButton(true);
+        }
+
+        @Override
+        public void specificExceptionImplementation()
+        {
+            view.enableFollowButton(true);
+        }
+
+        public abstract void changeFollow();
+    }
+
+    private class FollowObserver extends ChangeFollowObserver
+    {
+        @Override
+        public void changeFollow()
+        {
+            view.onFollow();
+        }
+    }
+
+    private class UnFollowObserver extends ChangeFollowObserver
+    {
+        @Override
+        public void changeFollow()
+        {
+            view.onUnfollow();
+        }
+    }
+
+    private FollowObserver followObserver = new FollowObserver();
+    private UnFollowObserver unFollowObserver= new UnFollowObserver();
+
     public interface View
     {
         void logout();
@@ -88,60 +178,60 @@ public class MainPresenter implements UserService.LogoutObserver, FollowService.
         view.hideFollowButton(hideButton);
     }
 
-    @Override
-    public void followSuccess()
-    {
-        view.enableFollowButton(true);
-        view.onFollow();
-    }
-
-    @Override
-    public void followFailure(String message)
-    {
-        view.enableFollowButton(true);
-        view.displayErrorMessage("Failed to follow: " + message);
-    }
-
-    @Override
-    public void followException(Exception ex)
-    {
-        view.enableFollowButton(true);
-        view.displayErrorMessage("Failed to follow because of exception: " + ex.getMessage());
-    }
+//    @Override
+//    public void followSuccess()
+//    {
+//        view.enableFollowButton(true);
+//        view.onFollow();
+//    }
+//
+//    @Override
+//    public void followFailure(String message)
+//    {
+//        view.enableFollowButton(true);
+//        view.displayErrorMessage("Failed to follow: " + message);
+//    }
+//
+//    @Override
+//    public void followException(Exception ex)
+//    {
+//        view.enableFollowButton(true);
+//        view.displayErrorMessage("Failed to follow because of exception: " + ex.getMessage());
+//    }
 
     public void followUser()
     {
         view.enableFollowButton(false);
         view.displayInfoMessage("Adding " + targetUser.getName() + "...");
-        new FollowService().followUser(targetUser, authToken, this);
+        new FollowService().followUser(targetUser, authToken, followObserver);
     }
 
-    @Override
-    public void unFollowSuccess()
-    {
-        view.enableFollowButton(true);
-        view.onUnfollow();
-    }
-
-    @Override
-    public void unFollowFailure(String message)
-    {
-        view.enableFollowButton(true);
-        view.displayErrorMessage("Failed to unfollow: " + message);
-    }
-
-    @Override
-    public void unFollowException(Exception ex)
-    {
-        view.enableFollowButton(true);
-        view.displayErrorMessage("Failed to unfollow because of exception: " + ex.getMessage());
-    }
+//    @Override
+//    public void unFollowSuccess()
+//    {
+//        view.enableFollowButton(true);
+//        view.onUnfollow();
+//    }
+//
+//    @Override
+//    public void unFollowFailure(String message)
+//    {
+//        view.enableFollowButton(true);
+//        view.displayErrorMessage("Failed to unfollow: " + message);
+//    }
+//
+//    @Override
+//    public void unFollowException(Exception ex)
+//    {
+//        view.enableFollowButton(true);
+//        view.displayErrorMessage("Failed to unfollow because of exception: " + ex.getMessage());
+//    }
 
     public void unFollowUser()
     {
         view.enableFollowButton(false);
         view.displayInfoMessage("Removing " + targetUser.getName() + "...");
-        new FollowService().unFollowUser(targetUser, authToken, this);
+        new FollowService().unFollowUser(targetUser, authToken,  unFollowObserver);
     }
 
     //Check following ----------------------------------------------------

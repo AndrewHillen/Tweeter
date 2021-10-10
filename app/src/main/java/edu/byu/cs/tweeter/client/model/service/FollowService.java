@@ -19,6 +19,10 @@ import edu.byu.cs.tweeter.client.backgroundTask.GetFollowingTask;
 import edu.byu.cs.tweeter.client.backgroundTask.IsFollowerTask;
 import edu.byu.cs.tweeter.client.backgroundTask.UnfollowTask;
 import edu.byu.cs.tweeter.client.cache.Cache;
+import edu.byu.cs.tweeter.client.model.service.handler.SimpleNotificationHandler;
+import edu.byu.cs.tweeter.client.model.service.observer.FollowObserver;
+import edu.byu.cs.tweeter.client.model.service.observer.SimpleNotificationObserver;
+import edu.byu.cs.tweeter.client.model.service.observer.UnFollowObserver;
 import edu.byu.cs.tweeter.client.view.main.MainActivity;
 import edu.byu.cs.tweeter.client.view.main.followers.FollowersFragment;
 import edu.byu.cs.tweeter.model.domain.AuthToken;
@@ -136,14 +140,21 @@ public class FollowService
     }
 
 
-    public interface FollowObserver
+//    public interface FollowObserver
+//    {
+//        void followSuccess();
+//        void followFailure(String message);
+//        void followException(Exception ex);
+//    }
+    public interface ChangeFollowObserver extends SimpleNotificationObserver
     {
-        void followSuccess();
-        void followFailure(String message);
-        void followException(Exception ex);
     }
 
-    public void followUser(User user, AuthToken authToken, FollowObserver observer)
+    public interface FollowObserver extends ChangeFollowObserver
+    {
+    }
+
+    public void followUser(User user, AuthToken authToken, ChangeFollowObserver observer)
     {
         FollowTask followTask = new FollowTask(authToken,
                 user, new FollowHandler(observer));
@@ -152,43 +163,59 @@ public class FollowService
     }
 
     // FollowHandler
-
-    private class FollowHandler extends Handler {
-
-        private FollowObserver observer;
-
-        public FollowHandler(FollowObserver observer)
+    public class FollowHandler extends SimpleNotificationHandler<ChangeFollowObserver>
+    {
+        protected FollowHandler(ChangeFollowObserver observer)
         {
-            this.observer = observer;
+            super(observer);
         }
 
         @Override
-        public void handleMessage(@NonNull Message msg) {
-            boolean success = msg.getData().getBoolean(FollowTask.SUCCESS_KEY);
-            if (success) {
-                observer.followSuccess();
-            }
-            else if (msg.getData().containsKey(FollowTask.MESSAGE_KEY))
-            {
-                String message = msg.getData().getString(FollowTask.MESSAGE_KEY);
-                observer.followFailure(message);
-            }
-            else if (msg.getData().containsKey(FollowTask.EXCEPTION_KEY))
-            {
-                Exception ex = (Exception) msg.getData().getSerializable(FollowTask.EXCEPTION_KEY);
-                observer.followException(ex);
-            }
+        protected String getFailurePrefix()
+        {
+            return "Failed to follow";
         }
     }
 
-    public interface UnFollowObserver
+//    private class FollowHandler extends Handler {
+//
+//        private FollowObserver observer;
+//
+//        public FollowHandler(FollowObserver observer)
+//        {
+//            this.observer = observer;
+//        }
+//
+//        @Override
+//        public void handleMessage(@NonNull Message msg) {
+//            boolean success = msg.getData().getBoolean(FollowTask.SUCCESS_KEY);
+//            if (success) {
+//                observer.followSuccess();
+//            }
+//            else if (msg.getData().containsKey(FollowTask.MESSAGE_KEY))
+//            {
+//                String message = msg.getData().getString(FollowTask.MESSAGE_KEY);
+//                observer.followFailure(message);
+//            }
+//            else if (msg.getData().containsKey(FollowTask.EXCEPTION_KEY))
+//            {
+//                Exception ex = (Exception) msg.getData().getSerializable(FollowTask.EXCEPTION_KEY);
+//                observer.followException(ex);
+//            }
+//        }
+//    }
+//
+//    public interface UnFollowObserver
+//    {
+//        void unFollowSuccess();
+//        void unFollowFailure(String message);
+//        void unFollowException(Exception ex);
+//    }
+    public interface UnFollowObserver extends SimpleNotificationObserver
     {
-        void unFollowSuccess();
-        void unFollowFailure(String message);
-        void unFollowException(Exception ex);
     }
 
-    public void unFollowUser(User user, AuthToken authToken, UnFollowObserver observer)
+    public void unFollowUser(User user, AuthToken authToken, ChangeFollowObserver observer)
     {
         UnfollowTask unfollowTask = new UnfollowTask(authToken,
                 user, new UnfollowHandler(observer));
@@ -198,32 +225,46 @@ public class FollowService
 
     // UnfollowHandler
 
-    private class UnfollowHandler extends Handler {
-        private UnFollowObserver observer;
-
-        public UnfollowHandler(UnFollowObserver observer)
+    public class UnfollowHandler extends SimpleNotificationHandler<ChangeFollowObserver>
+    {
+        protected UnfollowHandler(ChangeFollowObserver observer)
         {
-            this.observer = observer;
+            super(observer);
         }
 
         @Override
-        public void handleMessage(@NonNull Message msg) {
-            boolean success = msg.getData().getBoolean(UnfollowTask.SUCCESS_KEY);
-            if (success) {
-                observer.unFollowSuccess();
-            }
-            else if (msg.getData().containsKey(UnfollowTask.MESSAGE_KEY))
-            {
-                String message = msg.getData().getString(UnfollowTask.MESSAGE_KEY);
-                observer.unFollowFailure(message);
-            }
-            else if (msg.getData().containsKey(UnfollowTask.EXCEPTION_KEY))
-            {
-                Exception ex = (Exception) msg.getData().getSerializable(UnfollowTask.EXCEPTION_KEY);
-                observer.unFollowException(ex);
-            }
+        protected String getFailurePrefix()
+        {
+            return "Failed to follow";
         }
     }
+
+//    private class UnfollowHandler extends Handler {
+//        private UnFollowObserver observer;
+//
+//        public UnfollowHandler(UnFollowObserver observer)
+//        {
+//            this.observer = observer;
+//        }
+//
+//        @Override
+//        public void handleMessage(@NonNull Message msg) {
+//            boolean success = msg.getData().getBoolean(UnfollowTask.SUCCESS_KEY);
+//            if (success) {
+//                observer.unFollowSuccess();
+//            }
+//            else if (msg.getData().containsKey(UnfollowTask.MESSAGE_KEY))
+//            {
+//                String message = msg.getData().getString(UnfollowTask.MESSAGE_KEY);
+//                observer.unFollowFailure(message);
+//            }
+//            else if (msg.getData().containsKey(UnfollowTask.EXCEPTION_KEY))
+//            {
+//                Exception ex = (Exception) msg.getData().getSerializable(UnfollowTask.EXCEPTION_KEY);
+//                observer.unFollowException(ex);
+//            }
+//        }
+//    }
 
     public interface CheckFollowObserver
     {
