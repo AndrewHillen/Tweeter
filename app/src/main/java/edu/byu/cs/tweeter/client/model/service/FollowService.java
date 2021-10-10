@@ -146,15 +146,15 @@ public class FollowService
 //        void followFailure(String message);
 //        void followException(Exception ex);
 //    }
-    public interface ChangeFollowObserver extends SimpleNotificationObserver
+//    public interface ChangeFollowObserver extends SimpleNotificationObserver
+//    {
+//    }
+
+    public interface FollowObserver extends SimpleNotificationObserver
     {
     }
 
-    public interface FollowObserver extends ChangeFollowObserver
-    {
-    }
-
-    public void followUser(User user, AuthToken authToken, ChangeFollowObserver observer)
+    public void followUser(User user, AuthToken authToken, FollowObserver observer)
     {
         FollowTask followTask = new FollowTask(authToken,
                 user, new FollowHandler(observer));
@@ -163,9 +163,9 @@ public class FollowService
     }
 
     // FollowHandler
-    public class FollowHandler extends SimpleNotificationHandler<ChangeFollowObserver>
+    public class FollowHandler extends SimpleNotificationHandler<FollowObserver>
     {
-        protected FollowHandler(ChangeFollowObserver observer)
+        protected FollowHandler(FollowObserver observer)
         {
             super(observer);
         }
@@ -215,7 +215,7 @@ public class FollowService
     {
     }
 
-    public void unFollowUser(User user, AuthToken authToken, ChangeFollowObserver observer)
+    public void unFollowUser(User user, AuthToken authToken, UnFollowObserver observer)
     {
         UnfollowTask unfollowTask = new UnfollowTask(authToken,
                 user, new UnfollowHandler(observer));
@@ -225,9 +225,9 @@ public class FollowService
 
     // UnfollowHandler
 
-    public class UnfollowHandler extends SimpleNotificationHandler<ChangeFollowObserver>
+    public class UnfollowHandler extends SimpleNotificationHandler<UnFollowObserver>
     {
-        protected UnfollowHandler(ChangeFollowObserver observer)
+        protected UnfollowHandler(UnFollowObserver observer)
         {
             super(observer);
         }
