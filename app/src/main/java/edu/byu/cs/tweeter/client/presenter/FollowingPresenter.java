@@ -9,8 +9,31 @@ import edu.byu.cs.tweeter.client.model.service.UserService;
 import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.User;
 
-public class FollowingPresenter implements FollowService.GetFollowingObserver, UserService.GetUserObserver
+public class FollowingPresenter implements FollowService.GetFollowingObserver
 {
+
+    private class GetUserObserver implements UserService.GetUserObserver
+    {
+        @Override
+        public void handleSuccess(User user)
+        {
+            view.navigateToUser(user);
+        }
+
+        @Override
+        public void handleFailure(String message)
+        {
+            view.displayErrorMessage(message);
+        }
+
+        @Override
+        public void handleException(Exception ex)
+        {
+            //Do Exception stuff
+        }
+    }
+
+    private GetUserObserver getUserObserver = new GetUserObserver();
     public interface View
     {
         void addItems(List<User> followees);
@@ -52,7 +75,7 @@ public class FollowingPresenter implements FollowService.GetFollowingObserver, U
     public void goToUser(String alias)
     {
         view.displayInfoMessage("Getting user's profile...");
-        new UserService().getUser(authToken, alias, this);
+        new UserService().getUser(authToken, alias, getUserObserver);
     }
 
     // FollowService overrides--------------------------------------
@@ -84,22 +107,4 @@ public class FollowingPresenter implements FollowService.GetFollowingObserver, U
     }
 
     // UserService overrides ----------------------------------
-
-    @Override
-    public void getUserSuccess(User user)
-    {
-        view.navigateToUser(user);
-    }
-
-    @Override
-    public void getUserFailure(String message)
-    {
-        view.displayErrorMessage(message);
-    }
-
-    @Override
-    public void getUserException(Exception ex)
-    {
-        //Do Exception stuff
-    }
 }

@@ -20,8 +20,10 @@ import edu.byu.cs.tweeter.client.backgroundTask.LogoutTask;
 import edu.byu.cs.tweeter.client.backgroundTask.RegisterTask;
 import edu.byu.cs.tweeter.client.cache.Cache;
 import edu.byu.cs.tweeter.client.model.service.handler.AuthenticateHandler;
+import edu.byu.cs.tweeter.client.model.service.handler.BackgroundTaskHandler;
 import edu.byu.cs.tweeter.client.model.service.handler.SimpleNotificationHandler;
 import edu.byu.cs.tweeter.client.model.service.observer.AuthenticateObserver;
+import edu.byu.cs.tweeter.client.model.service.observer.ServiceObserver;
 import edu.byu.cs.tweeter.client.model.service.observer.SimpleNotificationObserver;
 import edu.byu.cs.tweeter.client.view.login.LoginFragment;
 import edu.byu.cs.tweeter.client.view.login.RegisterFragment;
@@ -31,11 +33,9 @@ import edu.byu.cs.tweeter.model.domain.User;
 
 public class UserService
 {
-    public interface GetUserObserver
+    public interface GetUserObserver extends ServiceObserver
     {
-        void getUserSuccess(User user);
-        void getUserFailure(String message);
-        void getUserException(Exception ex);
+        void handleSuccess(User user);
     }
     public void getUser(AuthToken authToken, String alias, GetUserObserver observer)
     {
@@ -47,34 +47,24 @@ public class UserService
     /**
      * Message handler (i.e., observer) for GetUserTask.
      */
-    private class GetUserHandler extends Handler
+    private class GetUserHandler extends BackgroundTaskHandler<GetUserObserver>
     {
-        private GetUserObserver observer;
-
         public GetUserHandler(GetUserObserver observer)
         {
-            this.observer = observer;
+            super(observer);
         }
 
         @Override
-        public void handleMessage(@NonNull Message msg) {
-            boolean success = msg.getData().getBoolean(GetUserTask.SUCCESS_KEY);
-            if (success)
-            {
-                User user = (User) msg.getData().getSerializable(GetUserTask.USER_KEY);
-                observer.getUserSuccess(user);
+        protected void handleSuccessMessage(GetUserObserver observer, Message msg)
+        {
+            User user = (User) msg.getData().getSerializable(GetUserTask.USER_KEY);
+            observer.handleSuccess(user);
+        }
 
-            }
-            else if (msg.getData().containsKey(GetUserTask.MESSAGE_KEY))
-            {
-                String message = msg.getData().getString(GetUserTask.MESSAGE_KEY);
-                observer.getUserFailure(message);
-            }
-            else if (msg.getData().containsKey(GetUserTask.EXCEPTION_KEY))
-            {
-                Exception ex = (Exception) msg.getData().getSerializable(GetUserTask.EXCEPTION_KEY);
-                observer.getUserException(ex);
-            }
+        @Override
+        protected String getFailurePrefix()
+        {
+            return "Failed to retrieve user";
         }
     }
 

@@ -19,8 +19,32 @@ import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.Status;
 import edu.byu.cs.tweeter.model.domain.User;
 
-public class FeedPresenter implements StatusService.GetFeedObserver, UserService.GetUserObserver
+public class FeedPresenter implements StatusService.GetFeedObserver
 {
+
+    private class GetUserObserver implements UserService.GetUserObserver
+    {
+        @Override
+        public void handleSuccess(User user)
+        {
+            view.navigateToUser(user);
+        }
+
+        @Override
+        public void handleFailure(String message)
+        {
+            view.displayErrorMessage(message);
+        }
+
+        @Override
+        public void handleException(Exception ex)
+        {
+            view.displayErrorMessage("Failed to get user's profile because of exception: " + ex.getMessage());
+        }
+    }
+
+    private GetUserObserver getUserObserver = new GetUserObserver();
+
     public interface View
     {
         void addItems(List<Status> feed);
@@ -65,7 +89,7 @@ public class FeedPresenter implements StatusService.GetFeedObserver, UserService
             view.navigateToWebpage(clickable);
         } else {
             view.displayInfoMessage("Getting user's profile...");
-            new UserService().getUser(authToken, clickable, this);
+            new UserService().getUser(authToken, clickable, getUserObserver);
         }
     }
 
@@ -93,24 +117,5 @@ public class FeedPresenter implements StatusService.GetFeedObserver, UserService
         isLoading = false;
         view.setLoading(false);
         view.displayErrorMessage(ex.getMessage());
-    }
-
-
-    @Override
-    public void getUserSuccess(User user)
-    {
-        view.navigateToUser(user);
-    }
-
-    @Override
-    public void getUserFailure(String message)
-    {
-        view.displayErrorMessage("Failed to get user's profile: " + message);
-    }
-
-    @Override
-    public void getUserException(Exception ex)
-    {
-        view.displayErrorMessage("Failed to get user's profile because of exception: " + ex.getMessage());
     }
 }
