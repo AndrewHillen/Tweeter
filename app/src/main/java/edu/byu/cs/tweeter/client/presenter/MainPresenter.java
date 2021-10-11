@@ -18,7 +18,6 @@ import edu.byu.cs.tweeter.model.domain.Status;
 import edu.byu.cs.tweeter.model.domain.User;
 
 public class MainPresenter implements FollowService.CheckFollowObserver,
-        FollowService.FollowingCountObserver, FollowService.FollowerCountObserver,
         StatusService.PostStatusObserver
 {
 
@@ -92,9 +91,53 @@ public class MainPresenter implements FollowService.CheckFollowObserver,
         }
     }
 
+    private class FollowingCountObserver implements FollowService.FollowingCountObserver
+    {
+        @Override
+        public void handleSuccess(int count)
+        {
+            view.setFollowingCount(count);
+        }
+
+        @Override
+        public void handleFailure(String message)
+        {
+            view.displayErrorMessage(message);
+        }
+
+        @Override
+        public void handleException(Exception ex)
+        {
+            view.displayErrorMessage("Failed to get following count because of exception: " + ex.getMessage());
+        }
+    }
+
+    private class FollowerCountObserver implements FollowService.FollowerCountObserver
+    {
+        @Override
+        public void handleSuccess(int count)
+        {
+            view.setFollowerCount(count);
+        }
+
+        @Override
+        public void handleFailure(String message)
+        {
+            view.displayErrorMessage(message);
+        }
+
+        @Override
+        public void handleException(Exception ex)
+        {
+            view.displayErrorMessage("Failed to get follower count because of exception: " + ex.getMessage());
+        }
+    }
+
     private FollowObserver followObserver = new FollowObserver();
     private UnFollowObserver unFollowObserver= new UnFollowObserver();
     private LogoutObserver logoutObserver = new LogoutObserver();
+    private FollowingCountObserver followingCountObserver = new FollowingCountObserver();
+    private FollowerCountObserver followerCountObserver = new FollowerCountObserver();
 
     public interface View
     {
@@ -190,50 +233,14 @@ public class MainPresenter implements FollowService.CheckFollowObserver,
         }
     }
 
-    @Override
-    public void followingCountSuccess(int count)
-    {
-        view.setFollowingCount(count);
-    }
-
-    @Override
-    public void followingCountFailure(String message)
-    {
-        view.displayErrorMessage("Failed to get following count: " + message);
-    }
-
-    @Override
-    public void followingCountException(Exception ex)
-    {
-        view.displayErrorMessage("Failed to get following count because of exception: " + ex.getMessage());
-    }
-
     public void getFollowingCount()
     {
-        new FollowService().getFollowingCount(authToken, targetUser, this);
-    }
-
-    @Override
-    public void followerCountSuccess(int count)
-    {
-        view.setFollowerCount(count);
-    }
-
-    @Override
-    public void followerCountFailure(String message)
-    {
-        view.displayErrorMessage("Failed to get follower count: " + message);
-    }
-
-    @Override
-    public void followerCountException(Exception ex)
-    {
-        view.displayErrorMessage("Failed to get following count because of exception: " + ex.getMessage());
+        new FollowService().getFollowingCount(authToken, targetUser, followingCountObserver);
     }
 
     public void getFollowerCount()
     {
-        new FollowService().getFollowerCount(authToken, targetUser, this);
+        new FollowService().getFollowerCount(authToken, targetUser, followerCountObserver);
     }
 
     //Status
