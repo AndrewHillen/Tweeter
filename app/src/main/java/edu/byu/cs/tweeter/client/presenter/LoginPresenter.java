@@ -7,8 +7,32 @@ import edu.byu.cs.tweeter.client.model.service.UserService;
 import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.User;
 
-public class LoginPresenter implements UserService.LoginObserver
+public class LoginPresenter
 {
+
+    private class LoginObserver implements UserService.LoginObserver
+    {
+        @Override
+        public void handleSuccess(User user, AuthToken authToken)
+        {
+            view.displayInfoMessage("Hello " + user.getName());
+            view.login(user, authToken);
+        }
+
+        @Override
+        public void handleFailure(String message)
+        {
+            view.displayErrorMessage(message);
+        }
+
+        @Override
+        public void handleException(Exception ex)
+        {
+            //Do exception stuff
+        }
+    }
+
+    private LoginObserver loginObserver = new LoginObserver();
 
     public interface View
     {
@@ -34,7 +58,7 @@ public class LoginPresenter implements UserService.LoginObserver
         try
         {
             validateLogin(alias, password);
-            new UserService().login(alias, password, this);
+            new UserService().login(alias, password, loginObserver);
         }
         catch(Exception ex)
         {
@@ -42,25 +66,6 @@ public class LoginPresenter implements UserService.LoginObserver
         }
     }
 
-
-    @Override
-    public void loginSuccess(User user, AuthToken authToken)
-    {
-        view.displayInfoMessage("Hello " + user.getName());
-        view.login(user, authToken);
-    }
-
-    @Override
-    public void loginFailure(String message)
-    {
-        view.displayErrorMessage(message);
-    }
-
-    @Override
-    public void loginException(Exception ex)
-    {
-        //Do exception stuff
-    }
 
     public void validateLogin(String alias, String password) {
         if (alias.charAt(0) != '@') {

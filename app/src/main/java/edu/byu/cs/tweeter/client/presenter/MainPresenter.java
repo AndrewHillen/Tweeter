@@ -17,7 +17,7 @@ import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.Status;
 import edu.byu.cs.tweeter.model.domain.User;
 
-public class MainPresenter implements UserService.LogoutObserver, FollowService.CheckFollowObserver,
+public class MainPresenter implements FollowService.CheckFollowObserver,
         FollowService.FollowingCountObserver, FollowService.FollowerCountObserver,
         StatusService.PostStatusObserver
 {
@@ -71,8 +71,30 @@ public class MainPresenter implements UserService.LogoutObserver, FollowService.
         }
     }
 
+    private class LogoutObserver implements UserService.LogoutObserver
+    {
+        @Override
+        public void handleSuccess()
+        {
+            view.logout();
+        }
+
+        @Override
+        public void handleFailure(String message)
+        {
+            view.displayErrorMessage(message);
+        }
+
+        @Override
+        public void handleException(Exception ex)
+        {
+            view.displayErrorMessage("Failed to logout because of exception: " + ex.getMessage());
+        }
+    }
+
     private FollowObserver followObserver = new FollowObserver();
     private UnFollowObserver unFollowObserver= new UnFollowObserver();
+    private LogoutObserver logoutObserver = new LogoutObserver();
 
     public interface View
     {
@@ -109,28 +131,10 @@ public class MainPresenter implements UserService.LogoutObserver, FollowService.
         checkFollowVisibility();
     }
 
-    @Override
-    public void logoutSuccess()
-    {
-        view.logout();
-    }
-
-    @Override
-    public void logoutFailure(String message)
-    {
-        view.displayErrorMessage("Failed to logout: " + message);
-    }
-
-    @Override
-    public void logoutException(Exception ex)
-    {
-        view.displayErrorMessage("Failed to logout because of exception: " + ex.getMessage());
-    }
-
     public void logout()
     {
         view.displayInfoMessage("Logging Out...");
-        new UserService().logout(authToken, this);
+        new UserService().logout(authToken, logoutObserver);
     }
 
     // Follow User
