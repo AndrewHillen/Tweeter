@@ -17,7 +17,7 @@ import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.Status;
 import edu.byu.cs.tweeter.model.domain.User;
 
-public class MainPresenter implements FollowService.CheckFollowObserver
+public class MainPresenter
 {
 
     private class FollowObserver implements FollowService.FollowObserver
@@ -153,12 +153,34 @@ public class MainPresenter implements FollowService.CheckFollowObserver
         }
     }
 
+    private class CheckFollowObserver implements FollowService.CheckFollowObserver
+    {
+        @Override
+        public void handleSuccess(boolean isFollower)
+        {
+            view.setIsFollower(isFollower);
+        }
+
+        @Override
+        public void handleFailure(String message)
+        {
+            view.displayErrorMessage(message);
+        }
+
+        @Override
+        public void handleException(Exception ex)
+        {
+            view.displayErrorMessage("Failed to determine following relationship because of exception: " + ex.getMessage());
+        }
+    }
+
     private FollowObserver followObserver = new FollowObserver();
     private UnFollowObserver unFollowObserver= new UnFollowObserver();
     private LogoutObserver logoutObserver = new LogoutObserver();
     private PostStatusObserver postStatusObserver = new PostStatusObserver();
     private FollowingCountObserver followingCountObserver = new FollowingCountObserver();
     private FollowerCountObserver followerCountObserver = new FollowerCountObserver();
+    private CheckFollowObserver checkFollowObserver = new CheckFollowObserver();
 
     public interface View
     {
@@ -227,30 +249,12 @@ public class MainPresenter implements FollowService.CheckFollowObserver
 
     //Check following ----------------------------------------------------
 
-    @Override
-    public void checkFollowSuccess(boolean isFollower)
-    {
-        view.setIsFollower(isFollower);
-    }
-
-    @Override
-    public void checkFollowFailure(String message)
-    {
-        view.displayErrorMessage("Failed to determine following relationship: " + message);
-    }
-
-    @Override
-    public void checkFollowException(Exception ex)
-    {
-        view.displayErrorMessage("Failed to determine following relationship because of exception: " + ex.getMessage());
-    }
-
     public void checkFollower()
     {
         isUser = targetUser.compareTo(loggedInUser) == 0;
         if(!isUser)
         {
-            new FollowService().checkFollower(authToken, loggedInUser, targetUser, this);
+            new FollowService().checkFollower(authToken, loggedInUser, targetUser, checkFollowObserver);
         }
     }
 

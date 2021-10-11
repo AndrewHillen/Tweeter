@@ -16,9 +16,11 @@ import edu.byu.cs.tweeter.client.backgroundTask.GetFollowingCountTask;
 import edu.byu.cs.tweeter.client.backgroundTask.GetFollowingTask;
 import edu.byu.cs.tweeter.client.backgroundTask.IsFollowerTask;
 import edu.byu.cs.tweeter.client.backgroundTask.UnfollowTask;
+import edu.byu.cs.tweeter.client.model.service.handler.BackgroundTaskHandler;
 import edu.byu.cs.tweeter.client.model.service.handler.CountHandler;
 import edu.byu.cs.tweeter.client.model.service.handler.SimpleNotificationHandler;
 import edu.byu.cs.tweeter.client.model.service.observer.CountObserver;
+import edu.byu.cs.tweeter.client.model.service.observer.ServiceObserver;
 import edu.byu.cs.tweeter.client.model.service.observer.SimpleNotificationObserver;
 import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.User;
@@ -190,11 +192,9 @@ public class FollowService extends BaseService
     }
 
 
-    public interface CheckFollowObserver
+    public interface CheckFollowObserver extends ServiceObserver
     {
-        void checkFollowSuccess(boolean isFollower);
-        void checkFollowFailure(String message);
-        void checkFollowException(Exception ex);
+        void handleSuccess(boolean isFollower);
     }
 
     public void checkFollower(AuthToken authToken, User loggedInUser, User targetUser, CheckFollowObserver observer)
@@ -207,33 +207,25 @@ public class FollowService extends BaseService
 
     // IsFollowerHandler
 
-    private class IsFollowerHandler extends Handler {
-
-        private CheckFollowObserver observer;
+    private class IsFollowerHandler extends BackgroundTaskHandler<CheckFollowObserver>
+    {
 
         public IsFollowerHandler(CheckFollowObserver observer)
         {
-            this.observer = observer;
+            super(observer);
         }
 
         @Override
-        public void handleMessage(@NonNull Message msg) {
-            boolean success = msg.getData().getBoolean(IsFollowerTask.SUCCESS_KEY);
-            if (success) {
-                boolean isFollower = msg.getData().getBoolean(IsFollowerTask.IS_FOLLOWER_KEY);
+        protected void handleSuccessMessage(CheckFollowObserver observer, Message msg)
+        {
+            boolean isFollower = msg.getData().getBoolean(IsFollowerTask.IS_FOLLOWER_KEY);
+            observer.handleSuccess(isFollower);
+        }
 
-                observer.checkFollowSuccess(isFollower);
-            }
-            else if (msg.getData().containsKey(IsFollowerTask.MESSAGE_KEY))
-            {
-                String message = msg.getData().getString(IsFollowerTask.MESSAGE_KEY);
-                observer.checkFollowFailure(message);
-            }
-            else if (msg.getData().containsKey(IsFollowerTask.EXCEPTION_KEY))
-            {
-                Exception ex = (Exception) msg.getData().getSerializable(IsFollowerTask.EXCEPTION_KEY);
-                observer.checkFollowException(ex);
-            }
+        @Override
+        protected String getFailurePrefix()
+        {
+            return "Failed to determine Follow relationship";
         }
     }
 
