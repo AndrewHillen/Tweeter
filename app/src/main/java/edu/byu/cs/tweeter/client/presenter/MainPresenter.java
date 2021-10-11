@@ -17,8 +17,7 @@ import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.Status;
 import edu.byu.cs.tweeter.model.domain.User;
 
-public class MainPresenter implements FollowService.CheckFollowObserver,
-        StatusService.PostStatusObserver
+public class MainPresenter implements FollowService.CheckFollowObserver
 {
 
     private class FollowObserver implements FollowService.FollowObserver
@@ -91,6 +90,27 @@ public class MainPresenter implements FollowService.CheckFollowObserver,
         }
     }
 
+    private class PostStatusObserver implements StatusService.PostStatusObserver
+    {
+        @Override
+        public void handleSuccess()
+        {
+            view.onStatusPost("Successfully Posted!");
+        }
+
+        @Override
+        public void handleFailure(String message)
+        {
+            view.displayErrorMessage(message);
+        }
+
+        @Override
+        public void handleException(Exception ex)
+        {
+            view.displayErrorMessage("Failed to post status because of exception: " + ex.getMessage());
+        }
+    }
+
     private class FollowingCountObserver implements FollowService.FollowingCountObserver
     {
         @Override
@@ -136,6 +156,7 @@ public class MainPresenter implements FollowService.CheckFollowObserver,
     private FollowObserver followObserver = new FollowObserver();
     private UnFollowObserver unFollowObserver= new UnFollowObserver();
     private LogoutObserver logoutObserver = new LogoutObserver();
+    private PostStatusObserver postStatusObserver = new PostStatusObserver();
     private FollowingCountObserver followingCountObserver = new FollowingCountObserver();
     private FollowerCountObserver followerCountObserver = new FollowerCountObserver();
 
@@ -246,32 +267,13 @@ public class MainPresenter implements FollowService.CheckFollowObserver,
     //Status
     //Post status
 
-
-    @Override
-    public void postStatusSuccess()
-    {
-        view.onStatusPost("Successfully Posted!");
-    }
-
-    @Override
-    public void postStatusFailure(String message)
-    {
-        view.displayErrorMessage("Failed to post status: " + message);
-    }
-
-    @Override
-    public void postStatusException(Exception ex)
-    {
-        view.displayErrorMessage("Failed to post status because of exception: " + ex.getMessage());
-    }
-
     public void postStatus(String post)
     {
         try
         {
             view.displayInfoMessage("Posting Status...");
             Status newStatus = new Status(post, loggedInUser, getFormattedDateTime(), parseURLs(post), parseMentions(post));
-            new StatusService().postStatus(authToken, newStatus, this);
+            new StatusService().postStatus(authToken, newStatus, postStatusObserver);
         }
         catch(Exception ex)
         {

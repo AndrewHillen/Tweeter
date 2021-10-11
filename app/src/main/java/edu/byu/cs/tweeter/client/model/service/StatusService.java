@@ -14,6 +14,8 @@ import edu.byu.cs.tweeter.client.backgroundTask.GetFeedTask;
 import edu.byu.cs.tweeter.client.backgroundTask.GetStoryTask;
 import edu.byu.cs.tweeter.client.backgroundTask.PostStatusTask;
 import edu.byu.cs.tweeter.client.cache.Cache;
+import edu.byu.cs.tweeter.client.model.service.handler.SimpleNotificationHandler;
+import edu.byu.cs.tweeter.client.model.service.observer.SimpleNotificationObserver;
 import edu.byu.cs.tweeter.client.view.main.MainActivity;
 import edu.byu.cs.tweeter.client.view.main.feed.FeedFragment;
 import edu.byu.cs.tweeter.client.view.main.story.StoryFragment;
@@ -127,11 +129,8 @@ public class StatusService
         }
     }
 
-    public interface PostStatusObserver
+    public interface PostStatusObserver extends SimpleNotificationObserver
     {
-        void postStatusSuccess();
-        void postStatusFailure(String message);
-        void postStatusException(Exception ex);
     }
 
     public void postStatus(AuthToken authToken, Status status, PostStatusObserver observer)
@@ -144,31 +143,18 @@ public class StatusService
 
     // PostStatusHandler
 
-    private class PostStatusHandler extends Handler {
-
-        private PostStatusObserver observer;
+    private class PostStatusHandler extends SimpleNotificationHandler<PostStatusObserver>
+    {
 
         public PostStatusHandler(PostStatusObserver observer)
         {
-            this.observer = observer;
+            super(observer);
         }
 
         @Override
-        public void handleMessage(@NonNull Message msg) {
-            boolean success = msg.getData().getBoolean(PostStatusTask.SUCCESS_KEY);
-            if (success) {
-                observer.postStatusSuccess();
-            }
-            else if (msg.getData().containsKey(PostStatusTask.MESSAGE_KEY))
-            {
-                String message = msg.getData().getString(PostStatusTask.MESSAGE_KEY);
-                observer.postStatusFailure(message);
-            }
-            else if (msg.getData().containsKey(PostStatusTask.EXCEPTION_KEY))
-            {
-                Exception ex = (Exception) msg.getData().getSerializable(PostStatusTask.EXCEPTION_KEY);
-                observer.postStatusException(ex);
-            }
+        protected String getFailurePrefix()
+        {
+            return "Failed to post status";
         }
     }
 }
