@@ -72,7 +72,7 @@ public class UserService extends BaseService
     {
     }
 
-    public void login(String alias, String password, LoginObserver observer)
+    public void login(String alias, String password, AuthenticateObserver observer)
     {
         // Send the login request.
         LoginTask loginTask = new LoginTask(alias, password,
@@ -83,10 +83,10 @@ public class UserService extends BaseService
     /**
      * Message handler (i.e., observer) for LoginTask
      */
-    private class LoginHandler extends AuthenticateHandler<LoginObserver>
+    private class LoginHandler extends AuthenticateHandler<AuthenticateObserver>
     {
 
-        public LoginHandler(LoginObserver observer)
+        public LoginHandler(AuthenticateObserver observer)
         {
             super(observer);
         }
@@ -105,7 +105,7 @@ public class UserService extends BaseService
 
     public void register(String firstName, String lastName,
                          String alias, String password,
-                         String imageBytesBase64, RegisterObserver observer)
+                         String imageBytesBase64, AuthenticateObserver observer)
     {
         RegisterTask registerTask = new RegisterTask(firstName, lastName,
                 alias, password, imageBytesBase64, new RegisterHandler(observer));
@@ -115,9 +115,9 @@ public class UserService extends BaseService
 
     // RegisterHandler
 
-    private class RegisterHandler extends AuthenticateHandler<RegisterObserver>{
+    private class RegisterHandler extends AuthenticateHandler<AuthenticateObserver>{
 
-        public RegisterHandler(RegisterObserver observer)
+        public RegisterHandler(AuthenticateObserver observer)
         {
             super(observer);
         }

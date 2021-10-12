@@ -13,11 +13,12 @@ import edu.byu.cs.tweeter.client.model.service.FollowService;
 import edu.byu.cs.tweeter.client.model.service.StatusService;
 import edu.byu.cs.tweeter.client.model.service.UserService;
 import edu.byu.cs.tweeter.client.model.service.observer.SimpleNotificationObserver;
+import edu.byu.cs.tweeter.client.presenter.views.PresenterView;
 import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.Status;
 import edu.byu.cs.tweeter.model.domain.User;
 
-public class MainPresenter
+public class MainPresenter extends BasePresenter<MainPresenter.View>
 {
 
     private class FollowObserver implements FollowService.FollowObserver
@@ -182,7 +183,7 @@ public class MainPresenter
     private FollowerCountObserver followerCountObserver = new FollowerCountObserver();
     private CheckFollowObserver checkFollowObserver = new CheckFollowObserver();
 
-    public interface View
+    public interface View extends PresenterView
     {
         void logout();
 
@@ -196,12 +197,8 @@ public class MainPresenter
         void onUnfollow();
 
         void onStatusPost(String message);
-
-        void displayErrorMessage(String message);
-        void displayInfoMessage(String message);
     }
 
-    private View view;
     private AuthToken authToken;
     private User targetUser;
     private User loggedInUser;
@@ -210,7 +207,7 @@ public class MainPresenter
 
     public MainPresenter(View view, AuthToken authToken, User targetUser, User loggedInUser)
     {
-        this.view = view;
+        super(view);
         this.authToken = authToken;
         this.targetUser = targetUser;
         this.loggedInUser = loggedInUser;
