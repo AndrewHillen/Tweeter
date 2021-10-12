@@ -7,7 +7,7 @@ import edu.byu.cs.tweeter.model.domain.User;
 
 public interface PagedView extends PresenterView
 {
-    void addItems(List<Status> feed);
+    <T> void addItems(List<T> items);
     void setLoading(boolean isLoading);
     void navigateToUser(User user);
 }

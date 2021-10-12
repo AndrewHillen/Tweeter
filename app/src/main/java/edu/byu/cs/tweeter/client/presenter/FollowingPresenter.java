@@ -1,110 +1,96 @@
 package edu.byu.cs.tweeter.client.presenter;
 
-import android.widget.Toast;
-
 import java.util.List;
 
 import edu.byu.cs.tweeter.client.model.service.FollowService;
 import edu.byu.cs.tweeter.client.model.service.UserService;
+import edu.byu.cs.tweeter.client.presenter.views.PagedView;
 import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.User;
 
-public class FollowingPresenter implements FollowService.GetFollowingObserver
+public class FollowingPresenter extends PagedPresenter<FollowingPresenter.View, User>
 {
 
-    private class GetUserObserver implements UserService.GetUserObserver
+    @Override
+    public void getItems(PagedObserver observer)
     {
-        @Override
-        public void handleSuccess(User user)
-        {
-            view.navigateToUser(user);
-        }
-
-        @Override
-        public void handleFailure(String message)
-        {
-            view.displayErrorMessage(message);
-        }
-
-        @Override
-        public void handleException(Exception ex)
-        {
-            //Do Exception stuff
-        }
+        new FollowService().getFollowing(authToken, user, PAGE_SIZE, lastItem, observer);
     }
 
-    private GetUserObserver getUserObserver = new GetUserObserver();
-    public interface View
+//    private class GetUserObserver implements UserService.GetUserObserver
+//    {
+//        @Override
+//        public void handleSuccess(User user)
+//        {
+//            view.navigateToUser(user);
+//        }
+//
+//        @Override
+//        public void handleFailure(String message)
+//        {
+//            view.displayErrorMessage(message);
+//        }
+//
+//        @Override
+//        public void handleException(Exception ex)
+//        {
+//            //Do Exception stuff
+//        }
+//    }
+
+//    private class GetFollowingObserver extends PagedObserver implements FollowService.GetFollowingObserver
+//    {
+//    }
+//
+//    private GetUserObserver getUserObserver = new GetUserObserver();
+//    private GetFollowingObserver getFollowingObserver = new GetFollowingObserver();
+    public interface View extends PagedView
     {
-        void addItems(List<User> followees);
-        void setLoading(boolean isLoading);
-        void navigateToUser(User user);
-
-        void displayErrorMessage(String message);
-        void displayInfoMessage(String message);
-
     }
 
-    private View view;
-    private AuthToken authToken;
-    private User user;
-    private User lastFollowee;
-    private boolean isLoading = false;
-
-    private boolean hasMorePages = true;
-
-    private static final int PAGE_SIZE = 10;
+//    private View view;
+//    private AuthToken authToken;
+//    private User user;
+//    private User lastFollowee;
+//    private boolean isLoading = false;
+//
+//    private boolean hasMorePages = true;
+//
+//    private static final int PAGE_SIZE = 10;
 
     public FollowingPresenter(View view, AuthToken authToken, User user)
     {
-        this.view = view;
-        this.authToken = authToken;
-        this.user = user;
+        super(view, authToken, user);
     }
 
-    public void loadMoreItems()
-    {
-        if(!isLoading && hasMorePages)
-        {
-            isLoading = true;
-            view.setLoading(true);
-            new FollowService().getFollowing(authToken, user, PAGE_SIZE, lastFollowee, this);
-        }
-    }
 
-    public void goToUser(String alias)
-    {
-        view.displayInfoMessage("Getting user's profile...");
-        new UserService().getUser(authToken, alias, getUserObserver);
-    }
+//    public FollowingPresenter(View view, AuthToken authToken, User user)
+//    {
+//        super(view);
+//        this.view = view;
+//        this.authToken = authToken;
+//        this.user = user;
+//    }
+
+//    public void loadMoreItems()
+//    {
+//        if(!isLoading && hasMorePages)
+//        {
+//            isLoading = true;
+//            view.setLoading(true);
+//
+//        }
+//    }
+
+//    public void goToUser(String alias)
+//    {
+//        view.displayInfoMessage("Getting user's profile...");
+//        new UserService().getUser(authToken, alias, getUserObserver);
+//    }
 
     // FollowService overrides--------------------------------------
 
-    @Override
-    public void getFollowingSuccess(List<User> followees, boolean hasMorePages, User lastFollowee)
-    {
-        this.lastFollowee = lastFollowee;
-        isLoading = false;
-        view.setLoading(false);
-        view.addItems(followees);
-        this.hasMorePages = hasMorePages;
-    }
 
-    @Override
-    public void getFollowingFailure(String message)
-    {
-        isLoading = false;
-        view.setLoading(false);
-        view.displayErrorMessage(message);
-    }
-
-    @Override
-    public void getFollowingException(Exception ex)
-    {
-        isLoading = false;
-        view.setLoading(false);
-        // Do exception stuff
-    }
 
     // UserService overrides ----------------------------------
 }
