@@ -11,10 +11,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import edu.byu.cs.tweeter.client.backgroundTask.GetFeedTask;
+import edu.byu.cs.tweeter.client.backgroundTask.GetFollowersTask;
 import edu.byu.cs.tweeter.client.backgroundTask.GetStoryTask;
 import edu.byu.cs.tweeter.client.backgroundTask.PostStatusTask;
 import edu.byu.cs.tweeter.client.cache.Cache;
+import edu.byu.cs.tweeter.client.model.service.handler.PagedHandler;
 import edu.byu.cs.tweeter.client.model.service.handler.SimpleNotificationHandler;
+import edu.byu.cs.tweeter.client.model.service.observer.PagedObserver;
 import edu.byu.cs.tweeter.client.model.service.observer.SimpleNotificationObserver;
 import edu.byu.cs.tweeter.client.view.main.MainActivity;
 import edu.byu.cs.tweeter.client.view.main.feed.FeedFragment;
@@ -32,7 +35,7 @@ public class StatusService
         void getFeedException(Exception ex);
     }
 
-    public void getFeed(User user, AuthToken authToken, int limit, Status lastStatus, GetFeedObserver observer)
+    public void getFeed(User user, AuthToken authToken, int limit, Status lastStatus, PagedObserver observer)
     {
         GetFeedTask getFeedTask = new GetFeedTask(authToken,
                 user, limit, lastStatus, new GetFeedHandler(observer));
@@ -43,37 +46,24 @@ public class StatusService
     /**
      * Message handler (i.e., observer) for GetFeedTask.
      */
-    private class GetFeedHandler extends Handler
+    private class GetFeedHandler extends PagedHandler<PagedObserver<Status>, Status>
     {
-        private GetFeedObserver observer;
-
-        public GetFeedHandler(GetFeedObserver observer)
+        public GetFeedHandler(PagedObserver<Status> observer)
         {
-            this.observer = observer;
+            super(observer);
         }
 
         @Override
-        public void handleMessage(@NonNull Message msg) {
+        protected String getFailurePrefix()
+        {
+            return "Failed to get Feed";
+        }
 
-            boolean success = msg.getData().getBoolean(GetFeedTask.SUCCESS_KEY);
-            if (success) {
-                List<Status> statuses = (List<Status>) msg.getData().getSerializable(GetFeedTask.STATUSES_KEY);
-                boolean hasMorePages = msg.getData().getBoolean(GetFeedTask.MORE_PAGES_KEY);
-
-                Status lastStatus = (statuses.size() > 0) ? statuses.get(statuses.size() - 1) : null;
-
-                observer.getFeedSuccess(statuses, hasMorePages, lastStatus);
-            }
-            else if (msg.getData().containsKey(GetFeedTask.MESSAGE_KEY))
-            {
-                String message = msg.getData().getString(GetFeedTask.MESSAGE_KEY);
-                observer.getFeedFailure(message);
-            }
-            else if (msg.getData().containsKey(GetFeedTask.EXCEPTION_KEY))
-            {
-                Exception ex = (Exception) msg.getData().getSerializable(GetFeedTask.EXCEPTION_KEY);
-                observer.getFeedException(ex);
-            }
+        @Override
+        protected List<Status> fetchItems(Message msg)
+        {
+            List<Status> feed = (List<Status>) msg.getData().getSerializable(GetFeedTask.STATUSES_KEY);
+            return feed;
         }
     }
 
@@ -84,7 +74,7 @@ public class StatusService
         void getStoryException(Exception ex);
     }
 
-    public void getStory(User user, AuthToken authToken, int limit, Status lastStatus, GetStoryObserver observer)
+    public void getStory(User user, AuthToken authToken, int limit, Status lastStatus, PagedObserver observer)
     {
         GetStoryTask getStoryTask = new GetStoryTask(Cache.getInstance().getCurrUserAuthToken(),
                 user, limit, lastStatus, new GetStoryHandler(observer));
@@ -95,37 +85,24 @@ public class StatusService
     /**
      * Message handler (i.e., observer) for GetStoryTask.
      */
-    private class GetStoryHandler extends Handler {
+    private class GetStoryHandler extends PagedHandler<PagedObserver<Status>, Status> {
 
-        private GetStoryObserver observer;
-
-        public GetStoryHandler(GetStoryObserver observer)
+        public GetStoryHandler(PagedObserver<Status> observer)
         {
-            this.observer = observer;
+            super(observer);
         }
 
         @Override
-        public void handleMessage(@NonNull Message msg) {
+        protected String getFailurePrefix()
+        {
+            return "Failed to get Story";
+        }
 
-            boolean success = msg.getData().getBoolean(GetStoryTask.SUCCESS_KEY);
-            if (success) {
-                List<Status> statuses = (List<Status>) msg.getData().getSerializable(GetStoryTask.STATUSES_KEY);
-                boolean hasMorePages = msg.getData().getBoolean(GetStoryTask.MORE_PAGES_KEY);
-                Status lastStatus = (statuses.size() > 0) ? statuses.get(statuses.size() - 1) : null;
-
-                observer.getStorySuccess(statuses, hasMorePages, lastStatus);
-
-            }
-            else if (msg.getData().containsKey(GetStoryTask.MESSAGE_KEY))
-            {
-                String message = msg.getData().getString(GetStoryTask.MESSAGE_KEY);
-                observer.getStoryFailure(message);
-            }
-            else if (msg.getData().containsKey(GetStoryTask.EXCEPTION_KEY))
-            {
-                Exception ex = (Exception) msg.getData().getSerializable(GetStoryTask.EXCEPTION_KEY);
-                observer.getStoryException(ex);
-            }
+        @Override
+        protected List<Status> fetchItems(Message msg)
+        {
+            List<Status> story = (List<Status>) msg.getData().getSerializable(GetStoryTask.STATUSES_KEY);
+            return story;
         }
     }
 
