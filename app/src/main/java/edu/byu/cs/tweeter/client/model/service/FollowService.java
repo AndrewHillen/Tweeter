@@ -40,8 +40,7 @@ public class FollowService extends BaseService
     {
         GetFollowingTask getFollowingTask = new GetFollowingTask(authToken,
                 target, limit, lastFollowee, new GetFollowingHandler(observer));
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.execute(getFollowingTask);
+        executeTask(getFollowingTask);
     }
 
 
@@ -82,8 +81,7 @@ public class FollowService extends BaseService
     {
         GetFollowersTask getFollowersTask = new GetFollowersTask(authToken, target, limit, lastFollower,
                 new GetFollowersHandler(observer));
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.execute(getFollowersTask);
+        executeTask(getFollowersTask);
     }
 
     /**
@@ -118,8 +116,7 @@ public class FollowService extends BaseService
     {
         FollowTask followTask = new FollowTask(authToken,
                 user, new FollowHandler(observer));
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.execute(followTask);
+        executeTask(followTask);
     }
 
     // FollowHandler
@@ -145,8 +142,7 @@ public class FollowService extends BaseService
     {
         UnfollowTask unfollowTask = new UnfollowTask(authToken,
                 user, new UnfollowHandler(observer));
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.execute(unfollowTask);
+        executeTask(unfollowTask);
     }
 
     // UnfollowHandler
@@ -175,8 +171,7 @@ public class FollowService extends BaseService
     {
         IsFollowerTask isFollowerTask = new IsFollowerTask(authToken,
                 loggedInUser, targetUser, new IsFollowerHandler(observer));
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.execute(isFollowerTask);
+        executeTask(isFollowerTask);
     }
 
     // IsFollowerHandler
@@ -209,10 +204,9 @@ public class FollowService extends BaseService
 
     public void getFollowingCount(AuthToken authToken, User user, FollowingCountObserver observer)
     {
-        ExecutorService executor = Executors.newSingleThreadExecutor();
         GetFollowingCountTask followingCountTask = new GetFollowingCountTask(authToken,
                 user, new GetFollowingCountHandler(observer));
-        executor.execute(followingCountTask);
+        executeTask(followingCountTask);
     }
 
     // GetFollowingCountHandler
@@ -238,10 +232,9 @@ public class FollowService extends BaseService
 
     public void getFollowerCount(AuthToken authToken, User user, FollowerCountObserver observer)
     {
-        ExecutorService executor = Executors.newSingleThreadExecutor();
         GetFollowersCountTask followersCountTask = new GetFollowersCountTask(authToken,
                 user, new GetFollowerCountHandler(observer));
-        executor.execute(followersCountTask);
+        executeTask(followersCountTask);
     }
 
     // GetFollowingCountHandler

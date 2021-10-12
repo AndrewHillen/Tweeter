@@ -31,7 +31,7 @@ import edu.byu.cs.tweeter.client.view.main.MainActivity;
 import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.User;
 
-public class UserService
+public class UserService extends BaseService
 {
     public interface GetUserObserver extends ServiceObserver
     {
@@ -40,8 +40,7 @@ public class UserService
     public void getUser(AuthToken authToken, String alias, GetUserObserver observer)
     {
         GetUserTask getUserTask = new GetUserTask(authToken, alias, new GetUserHandler(observer));
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.execute(getUserTask);
+        executeTask(getUserTask);
     }
 
     /**
@@ -78,8 +77,7 @@ public class UserService
         // Send the login request.
         LoginTask loginTask = new LoginTask(alias, password,
                 new LoginHandler(observer));
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.execute(loginTask);
+        executeTask(loginTask);
     }
 
     /**
@@ -112,8 +110,7 @@ public class UserService
         RegisterTask registerTask = new RegisterTask(firstName, lastName,
                 alias, password, imageBytesBase64, new RegisterHandler(observer));
 
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.execute(registerTask);
+        executeTask(registerTask);
     }
 
     // RegisterHandler
@@ -140,8 +137,7 @@ public class UserService
     public void logout(AuthToken authToken, LogoutObserver observer)
     {
         LogoutTask logoutTask = new LogoutTask(authToken, new LogoutHandler(observer));
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.execute(logoutTask);
+        executeTask(logoutTask);
     }
 
     // LogoutHandler

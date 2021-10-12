@@ -26,7 +26,7 @@ import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.Status;
 import edu.byu.cs.tweeter.model.domain.User;
 
-public class StatusService
+public class StatusService extends BaseService
 {
     public interface GetFeedObserver
     {
@@ -39,8 +39,7 @@ public class StatusService
     {
         GetFeedTask getFeedTask = new GetFeedTask(authToken,
                 user, limit, lastStatus, new GetFeedHandler(observer));
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.execute(getFeedTask);
+        executeTask(getFeedTask);
     }
 
     /**
@@ -78,8 +77,7 @@ public class StatusService
     {
         GetStoryTask getStoryTask = new GetStoryTask(Cache.getInstance().getCurrUserAuthToken(),
                 user, limit, lastStatus, new GetStoryHandler(observer));
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.execute(getStoryTask);
+        executeTask(getStoryTask);
     }
 
     /**
@@ -114,8 +112,7 @@ public class StatusService
     {
         PostStatusTask statusTask = new PostStatusTask(authToken,
                 status, new PostStatusHandler(observer));
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.execute(statusTask);
+        executeTask(statusTask);
     }
 
     // PostStatusHandler
