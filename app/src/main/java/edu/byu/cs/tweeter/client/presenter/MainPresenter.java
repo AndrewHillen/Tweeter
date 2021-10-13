@@ -274,12 +274,17 @@ public class MainPresenter extends BasePresenter<MainPresenter.View>
         {
             view.displayInfoMessage("Posting Status...");
             Status newStatus = new Status(post, loggedInUser, getFormattedDateTime(), parseURLs(post), parseMentions(post));
-            new StatusService().postStatus(authToken, newStatus, postStatusObserver);
+            getStatusService().postStatus(authToken, newStatus, postStatusObserver);
         }
         catch(Exception ex)
         {
             view.displayErrorMessage("Failed to post status because of exception: " + ex.getMessage());
         }
+    }
+
+    public StatusService getStatusService()
+    {
+        return new StatusService();
     }
 
     public String getFormattedDateTime() throws ParseException

@@ -21,17 +21,17 @@ public abstract class BackgroundTaskHandler<T extends ServiceObserver> extends H
     @Override
     public void handleMessage(@NonNull Message msg)
     {
-        boolean success = msg.getData().getBoolean(GetFollowingTask.SUCCESS_KEY);
+        boolean success = msg.getData().getBoolean(BackgroundTask.SUCCESS_KEY);
         if (success)
         {
             handleSuccessMessage(observer, msg);
         }
-        else if (msg.getData().containsKey(GetFollowingTask.MESSAGE_KEY))
+        else if (msg.getData().containsKey(BackgroundTask.MESSAGE_KEY))
         {
             String message = getFailurePrefix() + ": " +msg.getData().getString(BackgroundTask.MESSAGE_KEY);
             observer.handleFailure(message);
         }
-        else if (msg.getData().containsKey(GetFollowingTask.EXCEPTION_KEY))
+        else if (msg.getData().containsKey(BackgroundTask.EXCEPTION_KEY))
         {
             Exception ex = (Exception) msg.getData().getSerializable(BackgroundTask.EXCEPTION_KEY);
 
