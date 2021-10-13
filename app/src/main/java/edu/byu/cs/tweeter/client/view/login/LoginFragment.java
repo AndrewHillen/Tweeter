@@ -51,7 +51,7 @@ public class LoginFragment extends Fragment implements LoginPresenter.View
     }
 
     @Override
-    public void login(User user, AuthToken authToken)
+    public void authenticate(User user, AuthToken authToken)
     {
         // Cache user session information
         Cache.getInstance().setCurrUser(user);

@@ -66,7 +66,7 @@ public class RegisterFragment extends Fragment implements RegisterPresenter.View
     }
 
     @Override
-    public void register(User user, AuthToken authToken)
+    public void authenticate(User user, AuthToken authToken)
     {
         Intent intent = new Intent(getContext(), MainActivity.class);
 

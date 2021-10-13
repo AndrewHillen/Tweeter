@@ -59,9 +59,9 @@ public class FeedFragment extends Fragment implements FeedPresenter.View
     private FeedPresenter presenter;
 
     @Override
-    public void addItems(List<Status> feed)
+    public <T> void addItems(List<T> items)
     {
-        feedRecyclerViewAdapter.addItems(feed);
+        feedRecyclerViewAdapter.addItems((List<Status>) items);
     }
 
     @Override

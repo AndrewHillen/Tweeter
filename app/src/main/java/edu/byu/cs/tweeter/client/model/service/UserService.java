@@ -19,203 +19,141 @@ import edu.byu.cs.tweeter.client.backgroundTask.LoginTask;
 import edu.byu.cs.tweeter.client.backgroundTask.LogoutTask;
 import edu.byu.cs.tweeter.client.backgroundTask.RegisterTask;
 import edu.byu.cs.tweeter.client.cache.Cache;
+import edu.byu.cs.tweeter.client.model.service.handler.AuthenticateHandler;
+import edu.byu.cs.tweeter.client.model.service.handler.BackgroundTaskHandler;
+import edu.byu.cs.tweeter.client.model.service.handler.SimpleNotificationHandler;
+import edu.byu.cs.tweeter.client.model.service.observer.AuthenticateObserver;
+import edu.byu.cs.tweeter.client.model.service.observer.ServiceObserver;
+import edu.byu.cs.tweeter.client.model.service.observer.SimpleNotificationObserver;
 import edu.byu.cs.tweeter.client.view.login.LoginFragment;
 import edu.byu.cs.tweeter.client.view.login.RegisterFragment;
 import edu.byu.cs.tweeter.client.view.main.MainActivity;
 import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.User;
 
-public class UserService
+public class UserService extends BaseService
 {
-    public interface GetUserObserver
+    public interface GetUserObserver extends ServiceObserver
     {
-        void getUserSuccess(User user);
-        void getUserFailure(String message);
-        void getUserException(Exception ex);
+        void handleSuccess(User user);
     }
     public void getUser(AuthToken authToken, String alias, GetUserObserver observer)
     {
         GetUserTask getUserTask = new GetUserTask(authToken, alias, new GetUserHandler(observer));
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.execute(getUserTask);
+        executeTask(getUserTask);
     }
 
     /**
      * Message handler (i.e., observer) for GetUserTask.
      */
-    private class GetUserHandler extends Handler
+    private class GetUserHandler extends BackgroundTaskHandler<GetUserObserver>
     {
-        private GetUserObserver observer;
-
         public GetUserHandler(GetUserObserver observer)
         {
-            this.observer = observer;
+            super(observer);
         }
 
         @Override
-        public void handleMessage(@NonNull Message msg) {
-            boolean success = msg.getData().getBoolean(GetUserTask.SUCCESS_KEY);
-            if (success)
-            {
-                User user = (User) msg.getData().getSerializable(GetUserTask.USER_KEY);
-                observer.getUserSuccess(user);
+        protected void handleSuccessMessage(GetUserObserver observer, Message msg)
+        {
+            User user = (User) msg.getData().getSerializable(GetUserTask.USER_KEY);
+            observer.handleSuccess(user);
+        }
 
-            }
-            else if (msg.getData().containsKey(GetUserTask.MESSAGE_KEY))
-            {
-                String message = msg.getData().getString(GetUserTask.MESSAGE_KEY);
-                observer.getUserFailure(message);
-            }
-            else if (msg.getData().containsKey(GetUserTask.EXCEPTION_KEY))
-            {
-                Exception ex = (Exception) msg.getData().getSerializable(GetUserTask.EXCEPTION_KEY);
-                observer.getUserException(ex);
-            }
+        @Override
+        protected String getFailurePrefix()
+        {
+            return "Failed to retrieve user";
         }
     }
 
 
-    public interface LoginObserver
+    public interface LoginObserver extends AuthenticateObserver
     {
-        void loginSuccess(User user, AuthToken authToken);
-        void loginFailure(String message);
-        void loginException(Exception ex);
     }
 
-    public void login(String alias, String password, LoginObserver observer)
+    public void login(String alias, String password, AuthenticateObserver observer)
     {
         // Send the login request.
         LoginTask loginTask = new LoginTask(alias, password,
                 new LoginHandler(observer));
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.execute(loginTask);
+        executeTask(loginTask);
     }
 
     /**
      * Message handler (i.e., observer) for LoginTask
      */
-    private class LoginHandler extends Handler {
-        private LoginObserver observer;
+    private class LoginHandler extends AuthenticateHandler<AuthenticateObserver>
+    {
 
-        public LoginHandler(LoginObserver observer)
+        public LoginHandler(AuthenticateObserver observer)
         {
-            this.observer = observer;
+            super(observer);
         }
 
         @Override
-        public void handleMessage(@NonNull Message msg) {
-            boolean success = msg.getData().getBoolean(LoginTask.SUCCESS_KEY);
-            if (success) {
-                User loggedInUser = (User) msg.getData().getSerializable(LoginTask.USER_KEY);
-                AuthToken authToken = (AuthToken) msg.getData().getSerializable(LoginTask.AUTH_TOKEN_KEY);
-                observer.loginSuccess(loggedInUser, authToken);
-            }
-            else if (msg.getData().containsKey(LoginTask.MESSAGE_KEY))
-            {
-                String message = msg.getData().getString(LoginTask.MESSAGE_KEY);
-                observer.loginFailure("Failed to login: " + message);
-            }
-            else if (msg.getData().containsKey(LoginTask.EXCEPTION_KEY))
-            {
-                Exception ex = (Exception) msg.getData().getSerializable(LoginTask.EXCEPTION_KEY);
-                observer.loginException(ex);
-            }
+        protected String getFailurePrefix()
+        {
+            return "Failed to Login";
         }
     }
 
 
-    public interface RegisterObserver
+    public interface RegisterObserver extends AuthenticateObserver
     {
-        void registerSuccess(User user, AuthToken authToken);
-        void registerFailure(String message);
-        void registerException(Exception ex);
     }
 
     public void register(String firstName, String lastName,
                          String alias, String password,
-                         String imageBytesBase64, RegisterObserver observer)
+                         String imageBytesBase64, AuthenticateObserver observer)
     {
         RegisterTask registerTask = new RegisterTask(firstName, lastName,
                 alias, password, imageBytesBase64, new RegisterHandler(observer));
 
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.execute(registerTask);
+        executeTask(registerTask);
     }
 
     // RegisterHandler
 
-    private class RegisterHandler extends Handler {
+    private class RegisterHandler extends AuthenticateHandler<AuthenticateObserver>{
 
-        private RegisterObserver observer;
-
-        public RegisterHandler(RegisterObserver observer)
+        public RegisterHandler(AuthenticateObserver observer)
         {
-            this.observer = observer;
+            super(observer);
         }
 
         @Override
-        public void handleMessage(@NonNull Message msg) {
-            boolean success = msg.getData().getBoolean(RegisterTask.SUCCESS_KEY);
-            if (success) {
-                User registeredUser = (User) msg.getData().getSerializable(RegisterTask.USER_KEY);
-                AuthToken authToken = (AuthToken) msg.getData().getSerializable(RegisterTask.AUTH_TOKEN_KEY);
-
-                observer.registerSuccess(registeredUser, authToken);
-            }
-            else if (msg.getData().containsKey(RegisterTask.MESSAGE_KEY))
-            {
-                String message = msg.getData().getString(RegisterTask.MESSAGE_KEY);
-                observer.registerFailure(message);
-            }
-            else if (msg.getData().containsKey(RegisterTask.EXCEPTION_KEY))
-            {
-                Exception ex = (Exception) msg.getData().getSerializable(RegisterTask.EXCEPTION_KEY);
-                observer.registerException(ex);
-            }
+        protected String getFailurePrefix()
+        {
+            return "Failed to Register";
         }
     }
 
 
-    public interface LogoutObserver
+    public interface LogoutObserver extends SimpleNotificationObserver
     {
-        void logoutSuccess();
-        void logoutFailure(String message);
-        void logoutException(Exception ex);
     }
 
     public void logout(AuthToken authToken, LogoutObserver observer)
     {
         LogoutTask logoutTask = new LogoutTask(authToken, new LogoutHandler(observer));
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.execute(logoutTask);
+        executeTask(logoutTask);
     }
 
     // LogoutHandler
 
-    private class LogoutHandler extends Handler {
-        private LogoutObserver observer;
+    private class LogoutHandler extends SimpleNotificationHandler<LogoutObserver>
+    {
 
         public LogoutHandler(LogoutObserver observer)
         {
-            this.observer = observer;
+            super(observer);
         }
 
         @Override
-        public void handleMessage(@NonNull Message msg) {
-            boolean success = msg.getData().getBoolean(LogoutTask.SUCCESS_KEY);
-            if (success) {
-                observer.logoutSuccess();
-            }
-            else if (msg.getData().containsKey(LogoutTask.MESSAGE_KEY))
-            {
-                String message = msg.getData().getString(LogoutTask.MESSAGE_KEY);
-                observer.logoutFailure(message);
-            }
-            else if (msg.getData().containsKey(LogoutTask.EXCEPTION_KEY))
-            {
-                Exception ex = (Exception) msg.getData().getSerializable(LogoutTask.EXCEPTION_KEY);
-                observer.logoutException(ex);
-            }
+        protected String getFailurePrefix()
+        {
+            return "Failed to logout";
         }
     }
 

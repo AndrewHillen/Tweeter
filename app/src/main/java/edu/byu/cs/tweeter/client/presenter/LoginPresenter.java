@@ -4,27 +4,44 @@ import java.util.List;
 
 import edu.byu.cs.tweeter.client.cache.Cache;
 import edu.byu.cs.tweeter.client.model.service.UserService;
+import edu.byu.cs.tweeter.client.presenter.views.AuthenticateView;
 import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.User;
 
-public class LoginPresenter implements UserService.LoginObserver
+public class LoginPresenter extends AuthenticatePresenter<LoginPresenter.View>
 {
 
-    public interface View
+//    private class LoginObserver implements UserService.LoginObserver
+//    {
+//        @Override
+//        public void handleSuccess(User user, AuthToken authToken)
+//        {
+//            view.displayInfoMessage("Hello " + user.getName());
+//            view.authenticate(user, authToken);
+//        }
+//
+//        @Override
+//        public void handleFailure(String message)
+//        {
+//            view.displayErrorMessage(message);
+//        }
+//
+//        @Override
+//        public void handleException(Exception ex)
+//        {
+//            //Do exception stuff
+//        }
+//    }
+//
+//    private LoginObserver loginObserver = new LoginObserver();
+
+    public interface View extends AuthenticateView
     {
-        void login(User user, AuthToken authToken);
-
-        void displayErrorMessage(String message);
-        void clearErrorMessage();
-        void displayInfoMessage(String message);
-
     }
-
-    private View view;
 
     public LoginPresenter(View view)
     {
-        this.view = view;
+        super(view);
     }
 
     public void login(String alias, String password)
@@ -34,7 +51,7 @@ public class LoginPresenter implements UserService.LoginObserver
         try
         {
             validateLogin(alias, password);
-            new UserService().login(alias, password, this);
+            new UserService().login(alias, password, authenticateObserver);
         }
         catch(Exception ex)
         {
@@ -42,25 +59,6 @@ public class LoginPresenter implements UserService.LoginObserver
         }
     }
 
-
-    @Override
-    public void loginSuccess(User user, AuthToken authToken)
-    {
-        view.displayInfoMessage("Hello " + user.getName());
-        view.login(user, authToken);
-    }
-
-    @Override
-    public void loginFailure(String message)
-    {
-        view.displayErrorMessage(message);
-    }
-
-    @Override
-    public void loginException(Exception ex)
-    {
-        //Do exception stuff
-    }
 
     public void validateLogin(String alias, String password) {
         if (alias.charAt(0) != '@') {

@@ -8,27 +8,44 @@ import java.io.ByteArrayOutputStream;
 
 import edu.byu.cs.tweeter.client.cache.Cache;
 import edu.byu.cs.tweeter.client.model.service.UserService;
+import edu.byu.cs.tweeter.client.presenter.views.AuthenticateView;
 import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.User;
 
-public class RegisterPresenter implements UserService.RegisterObserver
+public class RegisterPresenter extends AuthenticatePresenter<RegisterPresenter.View>
 {
+//    private class RegisterObserver implements UserService.RegisterObserver
+//    {
+//        @Override
+//        public void handleSuccess(User user, AuthToken authToken)
+//        {
+//            view.displayInfoMessage("Hello " + user.getName());
+//            view.authenticate(user, authToken);
+//        }
+//
+//        @Override
+//        public void handleFailure(String message)
+//        {
+//            view.displayErrorMessage(message);
+//        }
+//
+//        @Override
+//        public void handleException(Exception ex)
+//        {
+//            view.displayErrorMessage("Failed to register because of exception: " + ex.getMessage());
+//            //Do exception stuff
+//        }
+//    }
+//
+//    private RegisterObserver registerObserver = new RegisterObserver();
 
-    public interface View
+    public interface View extends AuthenticateView
     {
-        void register(User user, AuthToken authToken);
-
-        void displayErrorMessage(String message);
-        void clearErrorMessage();
-        void displayInfoMessage(String message);
-
     }
 
-    private RegisterPresenter.View view;
-
-    public RegisterPresenter(RegisterPresenter.View view)
+    public RegisterPresenter(View view)
     {
-        this.view = view;
+        super(view);
     }
 
     public void register(String firstName, String lastName,
@@ -42,7 +59,7 @@ public class RegisterPresenter implements UserService.RegisterObserver
             validateRegistration(firstName, lastName, alias, password, imageToUpload);
             Bitmap image = imageToUpload.getBitmap();
             String imageBytesBase64 = processBitmap(image);
-            new UserService().register(firstName, lastName, alias, password, imageBytesBase64, this);
+            new UserService().register(firstName, lastName, alias, password, imageBytesBase64, authenticateObserver);
         }
         catch (Exception ex)
         {
@@ -87,24 +104,6 @@ public class RegisterPresenter implements UserService.RegisterObserver
         }
     }
 
-    @Override
-    public void registerSuccess(User user, AuthToken authToken)
-    {
-        view.displayInfoMessage("Hello " + user.getName());
-        view.register(user, authToken);
-    }
-
-    @Override
-    public void registerFailure(String message)
-    {
-        view.displayErrorMessage("Failed to register: " + message);
-    }
-
-    @Override
-    public void registerException(Exception ex)
-    {
-        view.displayErrorMessage("Failed to register because of exception: " + ex.getMessage());
-    }
 }
 
 
