@@ -5,6 +5,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
+import edu.byu.cs.tweeter.client.model.net.ServerFacade;
 import edu.byu.cs.tweeter.util.FakeData;
 
 public abstract class BackgroundTask implements Runnable
@@ -74,6 +75,8 @@ public abstract class BackgroundTask implements Runnable
     protected FakeData getFakeData() {
         return new FakeData();
     }
+
+    protected ServerFacade getServerFacade() {return new ServerFacade();}
 
     protected abstract boolean runTask() throws Exception;
     protected void loadSuccessBundle(Bundle msgBundle)
