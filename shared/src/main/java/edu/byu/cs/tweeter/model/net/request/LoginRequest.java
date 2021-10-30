@@ -5,9 +5,6 @@ package edu.byu.cs.tweeter.model.net.request;
  */
 public class LoginRequest extends AuthenticateRequest{
 
-    private String username;
-    private String password;
-
     /**
      * Allows construction of the object from Json. Private so it won't be called in normal code.
      */
