@@ -2,10 +2,12 @@ package edu.byu.cs.tweeter.server.dao;
 
 import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.User;
+import edu.byu.cs.tweeter.model.net.request.GetUserRequest;
 import edu.byu.cs.tweeter.model.net.request.LoginRequest;
 import edu.byu.cs.tweeter.model.net.request.LogoutRequest;
 import edu.byu.cs.tweeter.model.net.request.RegisterRequest;
 import edu.byu.cs.tweeter.model.net.response.AuthenticateResponse;
+import edu.byu.cs.tweeter.model.net.response.GetUserResponse;
 import edu.byu.cs.tweeter.model.net.response.LogoutResponse;
 import edu.byu.cs.tweeter.server.util.FakeData;
 
@@ -35,6 +37,12 @@ public class UserDAO
     public LogoutResponse logout(LogoutRequest request)
     {
         return new LogoutResponse(true);
+    }
+
+    public GetUserResponse getUser(GetUserRequest request)
+    {
+        User user = getFakeData().findUserByAlias(request.getAlias());
+        return new GetUserResponse(user);
     }
 
 

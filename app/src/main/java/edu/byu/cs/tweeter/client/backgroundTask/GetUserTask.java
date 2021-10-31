@@ -7,6 +7,8 @@ import android.util.Log;
 
 import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.User;
+import edu.byu.cs.tweeter.model.net.request.GetUserRequest;
+import edu.byu.cs.tweeter.model.net.response.GetUserResponse;
 import edu.byu.cs.tweeter.util.FakeData;
 
 /**
@@ -32,16 +34,16 @@ public class GetUserTask extends AuthenticatedTask {
     }
 
     @Override
-    public boolean runTask() {
-        getUser();
+    public boolean runTask() throws Exception{
+        GetUserRequest request = new GetUserRequest(authToken, alias);
+
+        GetUserResponse response = getServerFacade().getUser(request);
+
+        user = response.getUser();
+        BackgroundTaskUtils.loadImage(user);
         return true;
     }
 
-
-    private User getUser() {
-        user = getFakeData().findUserByAlias(alias);
-        return user;
-    }
 
     @Override
     protected void loadSuccessBundle(Bundle msgBundle)

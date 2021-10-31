@@ -3,13 +3,17 @@ package edu.byu.cs.tweeter.client.model.net;
 import java.io.IOException;
 
 import edu.byu.cs.tweeter.model.net.TweeterRemoteException;
+import edu.byu.cs.tweeter.model.net.request.AuthenticatedRequest;
 import edu.byu.cs.tweeter.model.net.request.FollowingRequest;
+import edu.byu.cs.tweeter.model.net.request.GetUserRequest;
 import edu.byu.cs.tweeter.model.net.request.LoginRequest;
 import edu.byu.cs.tweeter.model.net.request.LogoutRequest;
 import edu.byu.cs.tweeter.model.net.request.RegisterRequest;
 import edu.byu.cs.tweeter.model.net.response.FollowingResponse;
 import edu.byu.cs.tweeter.model.net.response.AuthenticateResponse;
+import edu.byu.cs.tweeter.model.net.response.GetUserResponse;
 import edu.byu.cs.tweeter.model.net.response.LogoutResponse;
+import edu.byu.cs.tweeter.model.net.response.Response;
 
 /**
  * Acts as a Facade to the Tweeter server. All network requests to the server should go through
@@ -26,13 +30,11 @@ public class ServerFacade {
     /**
      * Performs a login and if successful, returns the logged in user and an auth token.
      *
-     * @param request contains all information needed to perform a login.
      * @return the login response.
      */
-    public AuthenticateResponse login(LoginRequest request) throws IOException, TweeterRemoteException {
-        String urlPath = "/login";
-        AuthenticateResponse response = clientCommunicator.doPost(urlPath, request, null, AuthenticateResponse.class);
 
+    private <T extends Response> T handleResponse(T response)
+    {
         if(response.isSuccess()) {
             return response;
         } else {
@@ -40,15 +42,18 @@ public class ServerFacade {
         }
     }
 
+    public AuthenticateResponse login(LoginRequest request) throws IOException, TweeterRemoteException {
+        String urlPath = "/login";
+        AuthenticateResponse response = clientCommunicator.doPost(urlPath, request, null, AuthenticateResponse.class);
+
+        return handleResponse(response);
+    }
+
     public AuthenticateResponse register(RegisterRequest request) throws IOException, TweeterRemoteException {
         String urlPath = "/register";
         AuthenticateResponse response = clientCommunicator.doPost(urlPath, request, null, AuthenticateResponse.class);
 
-        if(response.isSuccess()) {
-            return response;
-        } else {
-            throw new RuntimeException(response.getMessage());
-        }
+        return handleResponse(response);
     }
 
     public LogoutResponse logout(LogoutRequest request) throws IOException, TweeterRemoteException
@@ -56,11 +61,15 @@ public class ServerFacade {
         String urlPath = "/logout";
         LogoutResponse response = clientCommunicator.doPost(urlPath, request, null, LogoutResponse.class);
 
-        if(response.isSuccess()) {
-            return response;
-        } else {
-            throw new RuntimeException(response.getMessage());
-        }
+        return handleResponse(response);
+    }
+
+    public GetUserResponse getUser(GetUserRequest request) throws IOException, TweeterRemoteException
+    {
+        String urlPath = "/getUser";
+        GetUserResponse response = clientCommunicator.doPost(urlPath, request, null, GetUserResponse.class);
+
+        return handleResponse(response);
     }
 
     /**
@@ -77,10 +86,6 @@ public class ServerFacade {
 
         FollowingResponse response = clientCommunicator.doPost(urlPath, request, null, FollowingResponse.class);
 
-        if(response.isSuccess()) {
-            return response;
-        } else {
-            throw new RuntimeException(response.getMessage());
-        }
+        return handleResponse(response);
     }
 }
