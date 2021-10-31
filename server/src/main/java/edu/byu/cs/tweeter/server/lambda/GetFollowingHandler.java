@@ -10,20 +10,28 @@ import edu.byu.cs.tweeter.server.service.FollowService;
 /**
  * An AWS lambda function that returns the users a user is following.
  */
-public class GetFollowingHandler implements RequestHandler<FollowingRequest, FollowingResponse> {
+public class GetFollowingHandler extends AuthorizationHandler<FollowingRequest, FollowingResponse> {
 
     /**
      * Returns the users that the user specified in the request is following. Uses information in
      * the request object to limit the number of followees returned and to return the next set of
      * followees after any that were returned in a previous request.
      *
-     * @param request contains the data required to fulfill the request.
-     * @param context the lambda context.
+     * @param request contains the data required to fulfill the request..
      * @return the followees.
      */
+
     @Override
-    public FollowingResponse handleRequest(FollowingRequest request, Context context) {
+    protected FollowingResponse processRequest(FollowingRequest request)
+    {
         FollowService service = new FollowService();
         return service.getFollowees(request);
+    }
+
+    //TODO Build the proper error here
+    @Override
+    protected FollowingResponse notAuthorized(FollowingRequest request)
+    {
+        return null;
     }
 }

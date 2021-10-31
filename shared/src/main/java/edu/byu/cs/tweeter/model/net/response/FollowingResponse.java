@@ -9,9 +9,7 @@ import edu.byu.cs.tweeter.model.net.request.FollowingRequest;
 /**
  * A paged response for a {@link FollowingRequest}.
  */
-public class FollowingResponse extends PagedResponse {
-
-    private List<User> followees;
+public class FollowingResponse extends PagedResponse<User> {
 
     /**
      * Creates a response indicating that the corresponding request was unsuccessful. Sets the
@@ -30,18 +28,9 @@ public class FollowingResponse extends PagedResponse {
      * @param hasMorePages an indicator of whether more data is available for the request.
      */
     public FollowingResponse(List<User> followees, boolean hasMorePages) {
-        super(true, hasMorePages);
-        this.followees = followees;
+        super(true, followees, hasMorePages);
     }
 
-    /**
-     * Returns the followees for the corresponding request.
-     *
-     * @return the followees.
-     */
-    public List<User> getFollowees() {
-        return followees;
-    }
 
     @Override
     public boolean equals(Object param) {
@@ -55,13 +44,13 @@ public class FollowingResponse extends PagedResponse {
 
         FollowingResponse that = (FollowingResponse) param;
 
-        return (Objects.equals(followees, that.followees) &&
+        return (Objects.equals(items, that.items) &&
                 Objects.equals(this.getMessage(), that.getMessage()) &&
                 this.isSuccess() == that.isSuccess());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(followees);
+        return Objects.hash(items);
     }
 }

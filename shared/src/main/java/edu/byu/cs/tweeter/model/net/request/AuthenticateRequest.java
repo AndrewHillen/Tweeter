@@ -3,8 +3,8 @@ package edu.byu.cs.tweeter.model.net.request;
 public class AuthenticateRequest
 {
 
-    protected String username;
-    protected String password;
+    public String username;
+    public String password;
 
     public AuthenticateRequest()
     {

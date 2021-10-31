@@ -3,9 +3,9 @@ package edu.byu.cs.tweeter.model.net.request;
 public class RegisterRequest extends AuthenticateRequest
 {
 
-    private String firstName;
-    private String lastName;
-    private String image;
+    public String firstName;
+    public String lastName;
+    public String image;
 
 
     public RegisterRequest()

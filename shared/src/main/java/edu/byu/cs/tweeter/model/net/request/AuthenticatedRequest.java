@@ -4,7 +4,7 @@ import edu.byu.cs.tweeter.model.domain.AuthToken;
 
 public class AuthenticatedRequest
 {
-    protected AuthToken authToken;
+    public AuthToken authToken;
 
     public AuthenticatedRequest()
     {

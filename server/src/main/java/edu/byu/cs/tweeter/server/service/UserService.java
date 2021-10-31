@@ -5,6 +5,7 @@ import edu.byu.cs.tweeter.model.domain.User;
 import edu.byu.cs.tweeter.model.net.request.LoginRequest;
 import edu.byu.cs.tweeter.model.net.request.RegisterRequest;
 import edu.byu.cs.tweeter.model.net.response.AuthenticateResponse;
+import edu.byu.cs.tweeter.server.dao.UserDAO;
 import edu.byu.cs.tweeter.server.util.FakeData;
 
 public class UserService {
@@ -23,6 +24,11 @@ public class UserService {
         User user = getDummyUser();
         AuthToken authToken = getDummyAuthToken();
         return new AuthenticateResponse(user, authToken);
+    }
+
+    public boolean checkAuthorization(AuthToken authToken)
+    {
+        return getUserDAO().checkAuthorization(authToken);
     }
 
     /**
@@ -54,4 +60,6 @@ public class UserService {
     FakeData getFakeData() {
         return new FakeData();
     }
+
+    public UserDAO getUserDAO() {return new UserDAO();}
 }
