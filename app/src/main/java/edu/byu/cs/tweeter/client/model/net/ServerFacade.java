@@ -8,11 +8,13 @@ import edu.byu.cs.tweeter.model.net.request.FollowingRequest;
 import edu.byu.cs.tweeter.model.net.request.GetUserRequest;
 import edu.byu.cs.tweeter.model.net.request.LoginRequest;
 import edu.byu.cs.tweeter.model.net.request.LogoutRequest;
+import edu.byu.cs.tweeter.model.net.request.PostStatusRequest;
 import edu.byu.cs.tweeter.model.net.request.RegisterRequest;
 import edu.byu.cs.tweeter.model.net.response.FollowingResponse;
 import edu.byu.cs.tweeter.model.net.response.AuthenticateResponse;
 import edu.byu.cs.tweeter.model.net.response.GetUserResponse;
 import edu.byu.cs.tweeter.model.net.response.LogoutResponse;
+import edu.byu.cs.tweeter.model.net.response.PostStatusResponse;
 import edu.byu.cs.tweeter.model.net.response.Response;
 
 /**
@@ -42,6 +44,8 @@ public class ServerFacade {
         }
     }
 
+    // User stuff------------------------------------------------------------------------
+
     public AuthenticateResponse login(LoginRequest request) throws IOException, TweeterRemoteException {
         String urlPath = "/login";
         AuthenticateResponse response = clientCommunicator.doPost(urlPath, request, null, AuthenticateResponse.class);
@@ -68,6 +72,17 @@ public class ServerFacade {
     {
         String urlPath = "/getUser";
         GetUserResponse response = clientCommunicator.doPost(urlPath, request, null, GetUserResponse.class);
+
+        return handleResponse(response);
+    }
+
+
+    //Status stuff ---------------------------------------------------------------------------------
+
+    public PostStatusResponse postStatus(PostStatusRequest request) throws IOException, TweeterRemoteException
+    {
+        String urlPath = "/postStatus";
+        PostStatusResponse response = clientCommunicator.doPost(urlPath, request, null, PostStatusResponse.class);
 
         return handleResponse(response);
     }

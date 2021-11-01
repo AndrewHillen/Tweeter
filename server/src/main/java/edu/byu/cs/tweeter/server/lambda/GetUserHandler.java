@@ -12,11 +12,12 @@ public class GetUserHandler extends AuthorizationHandler<GetUserRequest> impleme
     @Override
     public GetUserResponse handleRequest(GetUserRequest request, Context context)
     {
-        if(isAuthorized(request.getAuthToken()))
+        if(!checkAuthorization(request.getAuthToken()))
         {
-            UserService userService = new UserService();
-            return userService.getUser(request);
+            return badTokenResponse(new GetUserResponse(null));
         }
-        return null;
+        UserService userService = new UserService();
+        return userService.getUser(request);
+
     }
 }

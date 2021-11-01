@@ -15,12 +15,12 @@ public class GetFollowingHandler extends AuthorizationHandler<FollowingRequest> 
     @Override
     public FollowingResponse handleRequest(FollowingRequest request, Context context)
     {
-        if(isAuthorized(request.getAuthToken()))
+        if(!checkAuthorization(request.getAuthToken()))
         {
-            FollowService service = new FollowService();
-            return service.getFollowees(request);
+            return badTokenResponse(new FollowingResponse(null));
         }
-        return null;
+        FollowService service = new FollowService();
+        return service.getFollowees(request);
     }
 
     /**

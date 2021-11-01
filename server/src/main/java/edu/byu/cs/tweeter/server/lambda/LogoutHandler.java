@@ -12,10 +12,11 @@ public class LogoutHandler extends AuthorizationHandler<LogoutRequest> implement
     @Override
     public LogoutResponse handleRequest(LogoutRequest request, Context context)
     {
-        if(isAuthorized(request.authToken))
+        if(!checkAuthorization(request.getAuthToken()))
         {
-            return new UserService().logout(request);
+            return badTokenResponse(new LogoutResponse(false));
         }
-        return null;
+        return new UserService().logout(request);
+
     }
 }

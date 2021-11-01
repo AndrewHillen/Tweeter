@@ -7,6 +7,7 @@ import android.util.Log;
 
 import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.Status;
+import edu.byu.cs.tweeter.model.net.request.PostStatusRequest;
 
 /**
  * Background task that posts a new status sent by a user.
@@ -28,6 +29,7 @@ public class PostStatusTask extends AuthenticatedTask {
 
     @Override
     public boolean runTask() throws Exception{
+        PostStatusRequest request = new PostStatusRequest(authToken, status);
         return true;
     }
 }
