@@ -18,7 +18,7 @@ public class FollowingResponse extends PagedResponse<User> {
      * @param message a message describing why the request was unsuccessful.
      */
     public FollowingResponse(String message) {
-        super(false, message, false);
+        super(message);
     }
 
     /**

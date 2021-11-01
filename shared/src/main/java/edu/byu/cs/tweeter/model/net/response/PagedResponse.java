@@ -17,9 +17,8 @@ public class PagedResponse<T> extends Response {
         this.hasMorePages = hasMorePages;
     }
 
-    PagedResponse(boolean success, String message, boolean hasMorePages) {
-        super(success, message);
-        this.hasMorePages = hasMorePages;
+    PagedResponse(String message) {
+        super(false, message);
     }
 
     /**
@@ -31,5 +30,20 @@ public class PagedResponse<T> extends Response {
      */
     public boolean getHasMorePages() {
         return hasMorePages;
+    }
+
+    public List<T> getItems()
+    {
+        return items;
+    }
+
+    public void setItems(List<T> items)
+    {
+        this.items = items;
+    }
+
+    public void setHasMorePages(boolean hasMorePages)
+    {
+        this.hasMorePages = hasMorePages;
     }
 }

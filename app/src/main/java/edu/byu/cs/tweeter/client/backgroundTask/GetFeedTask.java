@@ -12,6 +12,8 @@ import java.util.List;
 import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.Status;
 import edu.byu.cs.tweeter.model.domain.User;
+import edu.byu.cs.tweeter.model.net.request.GetFeedRequest;
+import edu.byu.cs.tweeter.model.net.response.GetFeedResponse;
 import edu.byu.cs.tweeter.util.FakeData;
 import edu.byu.cs.tweeter.util.Pair;
 
@@ -29,12 +31,14 @@ public class GetFeedTask extends PagedTask<Status> {
     }
 
     @Override
-    public boolean runTask() throws IOException
+    public boolean runTask() throws Exception
     {
-        Pair<List<Status>, Boolean> pageOfStatus = getFeed();
+        GetFeedRequest request = new GetFeedRequest(authToken, targetUser, lastItem, limit);
 
-        items = pageOfStatus.getFirst();
-        hasMorePages = pageOfStatus.getSecond();
+        GetFeedResponse response = getServerFacade().getFeed(request);
+
+        items = response.getItems();
+        hasMorePages = response.getHasMorePages();
 
         for (Status s : items) {
             BackgroundTaskUtils.loadImage(s.getUser());

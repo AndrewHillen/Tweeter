@@ -5,6 +5,8 @@ import java.io.IOException;
 import edu.byu.cs.tweeter.model.net.TweeterRemoteException;
 import edu.byu.cs.tweeter.model.net.request.AuthenticatedRequest;
 import edu.byu.cs.tweeter.model.net.request.FollowingRequest;
+import edu.byu.cs.tweeter.model.net.request.GetFeedRequest;
+import edu.byu.cs.tweeter.model.net.request.GetStoryRequest;
 import edu.byu.cs.tweeter.model.net.request.GetUserRequest;
 import edu.byu.cs.tweeter.model.net.request.LoginRequest;
 import edu.byu.cs.tweeter.model.net.request.LogoutRequest;
@@ -12,6 +14,8 @@ import edu.byu.cs.tweeter.model.net.request.PostStatusRequest;
 import edu.byu.cs.tweeter.model.net.request.RegisterRequest;
 import edu.byu.cs.tweeter.model.net.response.FollowingResponse;
 import edu.byu.cs.tweeter.model.net.response.AuthenticateResponse;
+import edu.byu.cs.tweeter.model.net.response.GetFeedResponse;
+import edu.byu.cs.tweeter.model.net.response.GetStoryResponse;
 import edu.byu.cs.tweeter.model.net.response.GetUserResponse;
 import edu.byu.cs.tweeter.model.net.response.LogoutResponse;
 import edu.byu.cs.tweeter.model.net.response.PostStatusResponse;
@@ -83,6 +87,22 @@ public class ServerFacade {
     {
         String urlPath = "/postStatus";
         PostStatusResponse response = clientCommunicator.doPost(urlPath, request, null, PostStatusResponse.class);
+
+        return handleResponse(response);
+    }
+
+    public GetStoryResponse getStory(GetStoryRequest request) throws IOException, TweeterRemoteException
+    {
+        String urlPath = "/getStory";
+        GetStoryResponse response = clientCommunicator.doPost(urlPath, request, null, GetStoryResponse.class);
+
+        return handleResponse(response);
+    }
+
+    public GetFeedResponse getFeed(GetFeedRequest request) throws IOException, TweeterRemoteException
+    {
+        String urlPath = "/getFeed";
+        GetFeedResponse response = clientCommunicator.doPost(urlPath, request, null, GetFeedResponse.class);
 
         return handleResponse(response);
     }

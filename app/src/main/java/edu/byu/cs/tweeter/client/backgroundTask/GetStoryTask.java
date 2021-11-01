@@ -12,6 +12,8 @@ import java.util.List;
 import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.Status;
 import edu.byu.cs.tweeter.model.domain.User;
+import edu.byu.cs.tweeter.model.net.request.GetStoryRequest;
+import edu.byu.cs.tweeter.model.net.response.GetStoryResponse;
 import edu.byu.cs.tweeter.util.FakeData;
 import edu.byu.cs.tweeter.util.Pair;
 
@@ -29,13 +31,14 @@ public class GetStoryTask extends PagedTask<Status> {
     }
 
     @Override
-    public boolean runTask() throws IOException
+    public boolean runTask() throws Exception
     {
+        GetStoryRequest request = new GetStoryRequest(authToken, targetUser, lastItem, limit);
 
-        Pair<List<Status>, Boolean> pageOfStatus = getStory();
+        GetStoryResponse response = getServerFacade().getStory(request);
 
-        items = pageOfStatus.getFirst();
-        hasMorePages = pageOfStatus.getSecond();
+        items = response.getItems();
+        hasMorePages = response.getHasMorePages();
 
         for (Status s : items) {
             BackgroundTaskUtils.loadImage(s.getUser());
