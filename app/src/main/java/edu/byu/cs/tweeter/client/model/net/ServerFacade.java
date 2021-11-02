@@ -6,6 +6,8 @@ import edu.byu.cs.tweeter.model.net.TweeterRemoteException;
 import edu.byu.cs.tweeter.model.net.request.AuthenticatedRequest;
 import edu.byu.cs.tweeter.model.net.request.FollowingRequest;
 import edu.byu.cs.tweeter.model.net.request.GetFeedRequest;
+import edu.byu.cs.tweeter.model.net.request.GetFollowerCountRequest;
+import edu.byu.cs.tweeter.model.net.request.GetFollowingCountRequest;
 import edu.byu.cs.tweeter.model.net.request.GetStoryRequest;
 import edu.byu.cs.tweeter.model.net.request.GetUserRequest;
 import edu.byu.cs.tweeter.model.net.request.LoginRequest;
@@ -15,6 +17,8 @@ import edu.byu.cs.tweeter.model.net.request.RegisterRequest;
 import edu.byu.cs.tweeter.model.net.response.FollowingResponse;
 import edu.byu.cs.tweeter.model.net.response.AuthenticateResponse;
 import edu.byu.cs.tweeter.model.net.response.GetFeedResponse;
+import edu.byu.cs.tweeter.model.net.response.GetFollowerCountResponse;
+import edu.byu.cs.tweeter.model.net.response.GetFollowingCountResponse;
 import edu.byu.cs.tweeter.model.net.response.GetStoryResponse;
 import edu.byu.cs.tweeter.model.net.response.GetUserResponse;
 import edu.byu.cs.tweeter.model.net.response.LogoutResponse;
@@ -107,6 +111,8 @@ public class ServerFacade {
         return handleResponse(response);
     }
 
+    // Follows stuff -------------------------------------------------------------------------------------------
+
     /**
      * Returns the users that the user specified in the request is following. Uses information in
      * the request object to limit the number of followees returned and to return the next set of
@@ -120,6 +126,22 @@ public class ServerFacade {
             throws IOException, TweeterRemoteException {
 
         FollowingResponse response = clientCommunicator.doPost(urlPath, request, null, FollowingResponse.class);
+
+        return handleResponse(response);
+    }
+
+    public GetFollowerCountResponse getFollowerCount(GetFollowerCountRequest request) throws IOException, TweeterRemoteException
+    {
+        String urlPath = "/getFollowerCount";
+        GetFollowerCountResponse response = clientCommunicator.doPost(urlPath, request, null, GetFollowerCountResponse.class);
+
+        return handleResponse(response);
+    }
+
+    public GetFollowingCountResponse getFollowingCount(GetFollowingCountRequest request) throws IOException, TweeterRemoteException
+    {
+        String urlPath = "/getFollowingCount";
+        GetFollowingCountResponse response = clientCommunicator.doPost(urlPath, request, null, GetFollowingCountResponse.class);
 
         return handleResponse(response);
     }

@@ -7,6 +7,8 @@ import android.util.Log;
 
 import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.User;
+import edu.byu.cs.tweeter.model.net.request.GetFollowerCountRequest;
+import edu.byu.cs.tweeter.model.net.response.GetFollowerCountResponse;
 
 /**
  * Background task that queries how many followers a user has.
@@ -19,9 +21,11 @@ public class GetFollowersCountTask extends GetCountTask {
     }
 
     @Override
-    protected boolean fetchCount()
+    protected boolean fetchCount() throws Exception
     {
-        count = 20;
+        GetFollowerCountRequest request = new GetFollowerCountRequest(authToken, targetUser);
+        GetFollowerCountResponse response = getServerFacade().getFollowerCount(request);
+        count = response.getCount();
         return true;
     }
 }

@@ -14,7 +14,7 @@ public abstract class GetCountTask extends AuthenticatedTask
      * The user whose follower count is being retrieved.
      * (This can be any user, not just the currently logged-in user.)
      */
-    private User targetUser;
+    protected User targetUser;
 
     public GetCountTask(Handler messageHandler, AuthToken authToken, User targetUser)
     {
@@ -38,5 +38,5 @@ public abstract class GetCountTask extends AuthenticatedTask
         msgBundle.putInt(COUNT_KEY, count);
     }
 
-    protected abstract boolean fetchCount();
+    protected abstract boolean fetchCount() throws Exception;
 }
