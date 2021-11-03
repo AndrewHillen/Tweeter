@@ -234,14 +234,14 @@ public class MainPresenter extends BasePresenter<MainPresenter.View>
     {
         view.enableFollowButton(false);
         view.displayInfoMessage("Adding " + targetUser.getName() + "...");
-        new FollowService().followUser(targetUser, authToken, followObserver);
+        new FollowService().followUser(loggedInUser, targetUser, authToken, followObserver);
     }
 
     public void unFollowUser()
     {
         view.enableFollowButton(false);
         view.displayInfoMessage("Removing " + targetUser.getName() + "...");
-        new FollowService().unFollowUser(targetUser, authToken,  unFollowObserver);
+        new FollowService().unFollowUser(loggedInUser, targetUser, authToken,  unFollowObserver);
     }
 
     //Check following ----------------------------------------------------

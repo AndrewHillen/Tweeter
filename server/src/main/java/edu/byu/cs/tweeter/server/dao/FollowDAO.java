@@ -4,12 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.byu.cs.tweeter.model.domain.User;
+import edu.byu.cs.tweeter.model.net.request.FollowRequest;
 import edu.byu.cs.tweeter.model.net.request.FollowingRequest;
 import edu.byu.cs.tweeter.model.net.request.GetFollowerCountRequest;
 import edu.byu.cs.tweeter.model.net.request.GetFollowingCountRequest;
+import edu.byu.cs.tweeter.model.net.request.UnFollowRequest;
+import edu.byu.cs.tweeter.model.net.response.FollowResponse;
 import edu.byu.cs.tweeter.model.net.response.FollowingResponse;
 import edu.byu.cs.tweeter.model.net.response.GetFollowerCountResponse;
 import edu.byu.cs.tweeter.model.net.response.GetFollowingCountResponse;
+import edu.byu.cs.tweeter.model.net.response.UnFollowResponse;
 import edu.byu.cs.tweeter.server.util.FakeData;
 
 /**
@@ -32,6 +36,16 @@ public class FollowDAO {
     public GetFollowerCountResponse getFollowerCount(GetFollowerCountRequest request) {
         // TODO: uses the dummy data.  Replace with a real implementation.
         return new GetFollowerCountResponse(getDummyFollowees().size());
+    }
+
+    public FollowResponse follow(FollowRequest request)
+    {
+        return new FollowResponse(true);
+    }
+
+    public UnFollowResponse unfollow(UnFollowRequest request)
+    {
+        return new UnFollowResponse(true);
     }
 
     /**
