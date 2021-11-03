@@ -1,10 +1,12 @@
 package edu.byu.cs.tweeter.server.service;
 
+import edu.byu.cs.tweeter.model.net.request.CheckFollowRequest;
 import edu.byu.cs.tweeter.model.net.request.FollowRequest;
 import edu.byu.cs.tweeter.model.net.request.FollowingRequest;
 import edu.byu.cs.tweeter.model.net.request.GetFollowerCountRequest;
 import edu.byu.cs.tweeter.model.net.request.GetFollowingCountRequest;
 import edu.byu.cs.tweeter.model.net.request.UnFollowRequest;
+import edu.byu.cs.tweeter.model.net.response.CheckFollowResponse;
 import edu.byu.cs.tweeter.model.net.response.FollowResponse;
 import edu.byu.cs.tweeter.model.net.response.FollowingResponse;
 import edu.byu.cs.tweeter.model.net.response.GetFollowerCountResponse;
@@ -48,6 +50,11 @@ public class FollowService {
     public UnFollowResponse unfollow(UnFollowRequest request)
     {
         return getFollowingDAO().unfollow(request);
+    }
+
+    public CheckFollowResponse checkFollow(CheckFollowRequest request)
+    {
+        return getFollowingDAO().checkFollow(request);
     }
 
     /**

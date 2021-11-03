@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import edu.byu.cs.tweeter.model.net.TweeterRemoteException;
 import edu.byu.cs.tweeter.model.net.request.AuthenticatedRequest;
+import edu.byu.cs.tweeter.model.net.request.CheckFollowRequest;
 import edu.byu.cs.tweeter.model.net.request.FollowRequest;
 import edu.byu.cs.tweeter.model.net.request.FollowingRequest;
 import edu.byu.cs.tweeter.model.net.request.GetFeedRequest;
@@ -16,6 +17,7 @@ import edu.byu.cs.tweeter.model.net.request.LogoutRequest;
 import edu.byu.cs.tweeter.model.net.request.PostStatusRequest;
 import edu.byu.cs.tweeter.model.net.request.RegisterRequest;
 import edu.byu.cs.tweeter.model.net.request.UnFollowRequest;
+import edu.byu.cs.tweeter.model.net.response.CheckFollowResponse;
 import edu.byu.cs.tweeter.model.net.response.FollowResponse;
 import edu.byu.cs.tweeter.model.net.response.FollowingResponse;
 import edu.byu.cs.tweeter.model.net.response.AuthenticateResponse;
@@ -162,6 +164,14 @@ public class ServerFacade {
     {
         String urlPath = "/unfollow";
         UnFollowResponse response = clientCommunicator.doPost(urlPath, request, null, UnFollowResponse.class);
+
+        return handleResponse(response);
+    }
+
+    public CheckFollowResponse checkFollow(CheckFollowRequest request) throws IOException, TweeterRemoteException
+    {
+        String urlPath = "/checkFollow";
+        CheckFollowResponse response = clientCommunicator.doPost(urlPath, request, null, CheckFollowResponse.class);
 
         return handleResponse(response);
     }

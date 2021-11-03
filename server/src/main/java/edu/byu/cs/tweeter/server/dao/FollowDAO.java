@@ -2,13 +2,16 @@ package edu.byu.cs.tweeter.server.dao;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import edu.byu.cs.tweeter.model.domain.User;
+import edu.byu.cs.tweeter.model.net.request.CheckFollowRequest;
 import edu.byu.cs.tweeter.model.net.request.FollowRequest;
 import edu.byu.cs.tweeter.model.net.request.FollowingRequest;
 import edu.byu.cs.tweeter.model.net.request.GetFollowerCountRequest;
 import edu.byu.cs.tweeter.model.net.request.GetFollowingCountRequest;
 import edu.byu.cs.tweeter.model.net.request.UnFollowRequest;
+import edu.byu.cs.tweeter.model.net.response.CheckFollowResponse;
 import edu.byu.cs.tweeter.model.net.response.FollowResponse;
 import edu.byu.cs.tweeter.model.net.response.FollowingResponse;
 import edu.byu.cs.tweeter.model.net.response.GetFollowerCountResponse;
@@ -46,6 +49,11 @@ public class FollowDAO {
     public UnFollowResponse unfollow(UnFollowRequest request)
     {
         return new UnFollowResponse(true);
+    }
+
+    public CheckFollowResponse checkFollow(CheckFollowRequest request)
+    {
+        return new CheckFollowResponse(new Random().nextInt() > 0);
     }
 
     /**
