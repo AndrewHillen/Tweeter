@@ -9,7 +9,9 @@ import edu.byu.cs.tweeter.model.net.request.FollowRequest;
 import edu.byu.cs.tweeter.model.net.request.FollowingRequest;
 import edu.byu.cs.tweeter.model.net.request.GetFeedRequest;
 import edu.byu.cs.tweeter.model.net.request.GetFollowerCountRequest;
+import edu.byu.cs.tweeter.model.net.request.GetFollowersRequest;
 import edu.byu.cs.tweeter.model.net.request.GetFollowingCountRequest;
+import edu.byu.cs.tweeter.model.net.request.GetFollowingRequest;
 import edu.byu.cs.tweeter.model.net.request.GetStoryRequest;
 import edu.byu.cs.tweeter.model.net.request.GetUserRequest;
 import edu.byu.cs.tweeter.model.net.request.LoginRequest;
@@ -23,7 +25,9 @@ import edu.byu.cs.tweeter.model.net.response.FollowingResponse;
 import edu.byu.cs.tweeter.model.net.response.AuthenticateResponse;
 import edu.byu.cs.tweeter.model.net.response.GetFeedResponse;
 import edu.byu.cs.tweeter.model.net.response.GetFollowerCountResponse;
+import edu.byu.cs.tweeter.model.net.response.GetFollowersResponse;
 import edu.byu.cs.tweeter.model.net.response.GetFollowingCountResponse;
+import edu.byu.cs.tweeter.model.net.response.GetFollowingResponse;
 import edu.byu.cs.tweeter.model.net.response.GetStoryResponse;
 import edu.byu.cs.tweeter.model.net.response.GetUserResponse;
 import edu.byu.cs.tweeter.model.net.response.LogoutResponse;
@@ -172,6 +176,22 @@ public class ServerFacade {
     {
         String urlPath = "/checkFollow";
         CheckFollowResponse response = clientCommunicator.doPost(urlPath, request, null, CheckFollowResponse.class);
+
+        return handleResponse(response);
+    }
+
+    public GetFollowersResponse getFollowers(GetFollowersRequest request) throws IOException, TweeterRemoteException
+    {
+        String urlPath = "/getFollowers";
+        GetFollowersResponse response = clientCommunicator.doPost(urlPath, request, null, GetFollowersResponse.class);
+
+        return handleResponse(response);
+    }
+
+    public GetFollowingResponse getFollowing(GetFollowingRequest request) throws IOException, TweeterRemoteException
+    {
+        String urlPath = "/getFollowing";
+        GetFollowingResponse response = clientCommunicator.doPost(urlPath, request, null, GetFollowingResponse.class);
 
         return handleResponse(response);
     }

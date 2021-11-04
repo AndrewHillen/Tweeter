@@ -9,13 +9,17 @@ import edu.byu.cs.tweeter.model.net.request.CheckFollowRequest;
 import edu.byu.cs.tweeter.model.net.request.FollowRequest;
 import edu.byu.cs.tweeter.model.net.request.FollowingRequest;
 import edu.byu.cs.tweeter.model.net.request.GetFollowerCountRequest;
+import edu.byu.cs.tweeter.model.net.request.GetFollowersRequest;
 import edu.byu.cs.tweeter.model.net.request.GetFollowingCountRequest;
+import edu.byu.cs.tweeter.model.net.request.GetFollowingRequest;
 import edu.byu.cs.tweeter.model.net.request.UnFollowRequest;
 import edu.byu.cs.tweeter.model.net.response.CheckFollowResponse;
 import edu.byu.cs.tweeter.model.net.response.FollowResponse;
 import edu.byu.cs.tweeter.model.net.response.FollowingResponse;
 import edu.byu.cs.tweeter.model.net.response.GetFollowerCountResponse;
+import edu.byu.cs.tweeter.model.net.response.GetFollowersResponse;
 import edu.byu.cs.tweeter.model.net.response.GetFollowingCountResponse;
+import edu.byu.cs.tweeter.model.net.response.GetFollowingResponse;
 import edu.byu.cs.tweeter.model.net.response.UnFollowResponse;
 import edu.byu.cs.tweeter.server.util.FakeData;
 
@@ -24,13 +28,6 @@ import edu.byu.cs.tweeter.server.util.FakeData;
  */
 public class FollowDAO {
 
-    /**
-     * Gets the count of users from the database that the user specified is following. The
-     * current implementation uses generated data and doesn't actually access a database.
-     *
-     * @param follower the User whose count of how many following is desired.
-     * @return said count.
-     */
     public GetFollowingCountResponse getFollowingCount(GetFollowingCountRequest request) {
         // TODO: uses the dummy data.  Replace with a real implementation.
         return new GetFollowingCountResponse(getDummyFollowees().size());
@@ -56,17 +53,9 @@ public class FollowDAO {
         return new CheckFollowResponse(new Random().nextInt() > 0);
     }
 
-    /**
-     * Gets the users from the database that the user specified in the request is following. Uses
-     * information in the request object to limit the number of followees returned and to return the
-     * next set of followees after any that were returned in a previous request. The current
-     * implementation returns generated data and doesn't actually access a database.
-     *
-     * @param request contains information about the user whose followees are to be returned and any
-     *                other information required to satisfy the request.
-     * @return the followees.
-     */
-    public FollowingResponse getFollowees(FollowingRequest request) {
+
+    public GetFollowersResponse getFollowers(GetFollowersRequest request)
+    {
         // TODO: Generates dummy data. Replace with a real implementation.
         assert request.getLimit() > 0;
         assert request.getTargetUser() != null;
@@ -87,8 +76,32 @@ public class FollowDAO {
                 hasMorePages = followeesIndex < allFollowees.size();
             }
         }
+        return new GetFollowersResponse(responseFollowees, hasMorePages);
+    }
 
-        return new FollowingResponse(responseFollowees, hasMorePages);
+    public GetFollowingResponse getFollowing(GetFollowingRequest request)
+    {
+        // TODO: Generates dummy data. Replace with a real implementation.
+        assert request.getLimit() > 0;
+        assert request.getTargetUser() != null;
+
+        List<User> allFollowees = getDummyFollowees();
+        List<User> responseFollowees = new ArrayList<>(request.getLimit());
+
+        boolean hasMorePages = false;
+
+        if(request.getLimit() > 0) {
+            if (allFollowees != null) {
+                int followeesIndex = getFolloweesStartingIndex(request.getLastItem(), allFollowees);
+
+                for(int limitCounter = 0; followeesIndex < allFollowees.size() && limitCounter < request.getLimit(); followeesIndex++, limitCounter++) {
+                    responseFollowees.add(allFollowees.get(followeesIndex));
+                }
+
+                hasMorePages = followeesIndex < allFollowees.size();
+            }
+        }
+        return new GetFollowingResponse(responseFollowees, hasMorePages);
     }
 
     /**

@@ -4,13 +4,17 @@ import edu.byu.cs.tweeter.model.net.request.CheckFollowRequest;
 import edu.byu.cs.tweeter.model.net.request.FollowRequest;
 import edu.byu.cs.tweeter.model.net.request.FollowingRequest;
 import edu.byu.cs.tweeter.model.net.request.GetFollowerCountRequest;
+import edu.byu.cs.tweeter.model.net.request.GetFollowersRequest;
 import edu.byu.cs.tweeter.model.net.request.GetFollowingCountRequest;
+import edu.byu.cs.tweeter.model.net.request.GetFollowingRequest;
 import edu.byu.cs.tweeter.model.net.request.UnFollowRequest;
 import edu.byu.cs.tweeter.model.net.response.CheckFollowResponse;
 import edu.byu.cs.tweeter.model.net.response.FollowResponse;
 import edu.byu.cs.tweeter.model.net.response.FollowingResponse;
 import edu.byu.cs.tweeter.model.net.response.GetFollowerCountResponse;
+import edu.byu.cs.tweeter.model.net.response.GetFollowersResponse;
 import edu.byu.cs.tweeter.model.net.response.GetFollowingCountResponse;
+import edu.byu.cs.tweeter.model.net.response.GetFollowingResponse;
 import edu.byu.cs.tweeter.model.net.response.UnFollowResponse;
 import edu.byu.cs.tweeter.server.dao.FollowDAO;
 
@@ -28,8 +32,12 @@ public class FollowService {
      * @param request contains the data required to fulfill the request.
      * @return the followees.
      */
-    public FollowingResponse getFollowees(FollowingRequest request) {
-        return getFollowingDAO().getFollowees(request);
+    public GetFollowingResponse getFollowing(GetFollowingRequest request) {
+        return getFollowingDAO().getFollowing(request);
+    }
+
+    public GetFollowersResponse getFollowers(GetFollowersRequest request) {
+        return getFollowingDAO().getFollowers(request);
     }
 
     public GetFollowingCountResponse getFollowingCount(GetFollowingCountRequest request)
