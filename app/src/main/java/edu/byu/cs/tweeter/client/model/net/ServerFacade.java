@@ -99,7 +99,7 @@ public class ServerFacade {
 
     public PostStatusResponse postStatus(PostStatusRequest request) throws IOException, TweeterRemoteException
     {
-        String urlPath = "/postStatus";
+        String urlPath = "/poststatus";
         PostStatusResponse response = clientCommunicator.doPost(urlPath, request, null, PostStatusResponse.class);
 
         return handleResponse(response);
