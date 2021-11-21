@@ -5,6 +5,9 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
+import java.io.IOException;
+
+import edu.byu.cs.tweeter.client.model.net.ServerFacade;
 import edu.byu.cs.tweeter.util.FakeData;
 
 public abstract class BackgroundTask implements Runnable
@@ -39,7 +42,7 @@ public abstract class BackgroundTask implements Runnable
         }
     }
 
-    private void sendSuccessMessage() {
+    private void sendSuccessMessage() throws Exception{
         Bundle msgBundle = new Bundle();
         msgBundle.putBoolean(SUCCESS_KEY, true);
 
@@ -75,8 +78,10 @@ public abstract class BackgroundTask implements Runnable
         return new FakeData();
     }
 
+    protected ServerFacade getServerFacade() {return new ServerFacade();}
+
     protected abstract boolean runTask() throws Exception;
-    protected void loadSuccessBundle(Bundle msgBundle)
+    protected void loadSuccessBundle(Bundle msgBundle) throws Exception
     {
 
         // Do nothing

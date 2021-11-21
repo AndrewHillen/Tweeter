@@ -11,6 +11,8 @@ import java.util.List;
 
 import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.User;
+import edu.byu.cs.tweeter.model.net.request.GetFollowersRequest;
+import edu.byu.cs.tweeter.model.net.response.GetFollowersResponse;
 import edu.byu.cs.tweeter.util.FakeData;
 import edu.byu.cs.tweeter.util.Pair;
 
@@ -28,12 +30,13 @@ public class GetFollowersTask extends PagedTask<User> {
     }
 
     @Override
-    public boolean runTask() throws IOException
+    public boolean runTask() throws Exception
     {
-        Pair<List<User>, Boolean> pageOfUsers = getFollowers();
+        GetFollowersRequest request = new GetFollowersRequest(authToken, targetUser, lastItem, limit);
+        GetFollowersResponse response = getServerFacade().getFollowers(request);
 
-        items = pageOfUsers.getFirst();
-        hasMorePages = pageOfUsers.getSecond();
+        items = response.getItems();
+        hasMorePages = response.getHasMorePages();
 
         for (User u : items) {
             BackgroundTaskUtils.loadImage(u);
@@ -51,11 +54,6 @@ public class GetFollowersTask extends PagedTask<User> {
     protected void addItemsToBundle(Bundle msgBundle)
     {
         msgBundle.putSerializable(FOLLOWERS_KEY, (Serializable) items);
-    }
-
-    private Pair<List<User>, Boolean> getFollowers() {
-        Pair<List<User>, Boolean> pageOfUsers = getFakeData().getPageOfUsers(lastItem, limit, targetUser);
-        return pageOfUsers;
     }
 
 

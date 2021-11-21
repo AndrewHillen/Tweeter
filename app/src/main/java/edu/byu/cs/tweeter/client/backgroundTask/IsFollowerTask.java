@@ -9,6 +9,8 @@ import java.util.Random;
 
 import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.User;
+import edu.byu.cs.tweeter.model.net.request.CheckFollowRequest;
+import edu.byu.cs.tweeter.model.net.response.CheckFollowResponse;
 
 /**
  * Background task that determines if one user is following another.
@@ -28,6 +30,8 @@ public class IsFollowerTask extends AuthenticatedTask {
      */
     private User followee;
 
+    private boolean isFollower;
+
 
     public IsFollowerTask(AuthToken authToken, User follower, User followee, Handler messageHandler) {
         super(messageHandler, authToken);
@@ -37,6 +41,11 @@ public class IsFollowerTask extends AuthenticatedTask {
 
     @Override
     public boolean runTask() throws Exception{
+
+        CheckFollowRequest request = new CheckFollowRequest(authToken, follower.getAlias(), followee.getAlias());
+        CheckFollowResponse response = getServerFacade().checkFollow(request);
+
+        isFollower = response.getIsFollowing();
         //Add functionality later
         return true;
     }
@@ -44,7 +53,7 @@ public class IsFollowerTask extends AuthenticatedTask {
     @Override
     protected void loadSuccessBundle(Bundle msgBundle)
     {
-        boolean isFollower = new Random().nextInt() > 0;
+        //boolean isFollower = new Random().nextInt() > 0;
         msgBundle.putBoolean(IS_FOLLOWER_KEY, isFollower);
     }
 }

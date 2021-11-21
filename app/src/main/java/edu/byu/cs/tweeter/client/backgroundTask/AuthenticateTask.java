@@ -27,17 +27,10 @@ public abstract class AuthenticateTask extends BackgroundTask
     }
 
     @Override
-    protected void loadSuccessBundle(Bundle msgBundle)
+    protected void loadSuccessBundle(Bundle msgBundle) throws IOException
     {
+        BackgroundTaskUtils.loadImage(user);
         msgBundle.putSerializable(USER_KEY, user);
         msgBundle.putSerializable(AUTH_TOKEN_KEY, authToken);
-    }
-
-    protected Pair<User, AuthToken> doAuthenticate() throws IOException
-    {
-        User registeredUser = getFakeData().getFirstUser();
-        BackgroundTaskUtils.loadImage(registeredUser);
-        AuthToken authToken = getFakeData().getAuthToken();
-        return new Pair<>(registeredUser, authToken);
     }
 }

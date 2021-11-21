@@ -9,6 +9,8 @@ import java.io.IOException;
 
 import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.User;
+import edu.byu.cs.tweeter.model.net.request.RegisterRequest;
+import edu.byu.cs.tweeter.model.net.response.AuthenticateResponse;
 import edu.byu.cs.tweeter.util.FakeData;
 import edu.byu.cs.tweeter.util.Pair;
 
@@ -41,12 +43,14 @@ public class RegisterTask extends AuthenticateTask {
     }
 
     @Override
-    public boolean runTask() throws IOException
+    public boolean runTask() throws Exception
     {
-        Pair<User, AuthToken> loginResult = doAuthenticate();
+        RegisterRequest registerRequest = new RegisterRequest(username, password, firstName, lastName, image);
 
-        user = loginResult.getFirst();
-        authToken = loginResult.getSecond();
+        AuthenticateResponse authenticateResponse = getServerFacade().register(registerRequest);
+
+        user = authenticateResponse.getUser();
+        authToken = authenticateResponse.getAuthToken();
         if(user == null || authToken == null)
         {
             return false;

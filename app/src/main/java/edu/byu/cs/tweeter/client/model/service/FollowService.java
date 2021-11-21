@@ -112,10 +112,10 @@ public class FollowService extends BaseService
     {
     }
 
-    public void followUser(User user, AuthToken authToken, FollowObserver observer)
+    public void followUser(User loggedInUser, User targetUser, AuthToken authToken, FollowObserver observer)
     {
         FollowTask followTask = new FollowTask(authToken,
-                user, new FollowHandler(observer));
+                loggedInUser, targetUser, new FollowHandler(observer));
         executeTask(followTask);
     }
 
@@ -138,10 +138,10 @@ public class FollowService extends BaseService
     {
     }
 
-    public void unFollowUser(User user, AuthToken authToken, UnFollowObserver observer)
+    public void unFollowUser(User loggedInUser, User targetUser, AuthToken authToken, UnFollowObserver observer)
     {
         UnfollowTask unfollowTask = new UnfollowTask(authToken,
-                user, new UnfollowHandler(observer));
+                loggedInUser, targetUser, new UnfollowHandler(observer));
         executeTask(unfollowTask);
     }
 

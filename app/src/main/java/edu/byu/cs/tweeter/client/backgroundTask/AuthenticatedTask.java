@@ -10,7 +10,7 @@ public abstract class AuthenticatedTask extends BackgroundTask
      * Auth token for logged-in user.
      * This user is the "follower" in the relationship.
      */
-    private AuthToken authToken;
+    protected AuthToken authToken;
 
     public AuthenticatedTask(Handler messageHandler, AuthToken authToken)
     {

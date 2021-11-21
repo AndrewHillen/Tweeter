@@ -11,6 +11,10 @@ import java.util.List;
 
 import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.User;
+import edu.byu.cs.tweeter.model.net.request.GetFollowersRequest;
+import edu.byu.cs.tweeter.model.net.request.GetFollowingRequest;
+import edu.byu.cs.tweeter.model.net.response.GetFollowersResponse;
+import edu.byu.cs.tweeter.model.net.response.GetFollowingResponse;
 import edu.byu.cs.tweeter.util.FakeData;
 import edu.byu.cs.tweeter.util.Pair;
 
@@ -30,11 +34,12 @@ public class GetFollowingTask extends PagedTask<User> {
     }
 
     @Override
-    public boolean runTask() throws IOException {
-        Pair<List<User>, Boolean> pageOfUsers = getFollowees();
+    public boolean runTask() throws Exception {
+        GetFollowingRequest request = new GetFollowingRequest(authToken, targetUser, lastItem, limit);
+        GetFollowingResponse response = getServerFacade().getFollowing(request);
 
-        items = pageOfUsers.getFirst();
-        hasMorePages = pageOfUsers.getSecond();
+        items = response.getItems();
+        hasMorePages = response.getHasMorePages();
 
         for (User u : items) {
             BackgroundTaskUtils.loadImage(u);
