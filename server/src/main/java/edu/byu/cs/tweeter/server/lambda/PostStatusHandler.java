@@ -5,6 +5,7 @@ import com.amazonaws.services.lambda.runtime.RequestHandler;
 
 import edu.byu.cs.tweeter.model.net.request.PostStatusRequest;
 import edu.byu.cs.tweeter.model.net.response.PostStatusResponse;
+import edu.byu.cs.tweeter.server.dao.DynamoDAOFactory;
 import edu.byu.cs.tweeter.server.service.StatusService;
 
 public class PostStatusHandler extends AuthorizationHandler<PostStatusRequest> implements RequestHandler<PostStatusRequest, PostStatusResponse>
@@ -12,10 +13,12 @@ public class PostStatusHandler extends AuthorizationHandler<PostStatusRequest> i
     @Override
     public PostStatusResponse handleRequest(PostStatusRequest request, Context context)
     {
-        if(!checkAuthorization(request.getAuthToken()))
+        if(!checkAuthorization(request.getAuthToken(), request.getUserAlias()))
         {
             return badTokenResponse(new PostStatusResponse(false));
         }
-        return new StatusService().postStatus(request);
+        StatusService statusService = new StatusService(new DynamoDAOFactory());
+
+        return statusService.postStatus(request);
     }
 }

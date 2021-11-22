@@ -8,8 +8,19 @@ import edu.byu.cs.tweeter.model.net.response.GetStoryResponse;
 import edu.byu.cs.tweeter.model.net.response.PostStatusResponse;
 import edu.byu.cs.tweeter.server.dao.StatusDAO;
 
-public class StatusService
+public class StatusService extends BaseService
 {
+    BaseService.FeedDAO feedDAO;
+    BaseService.StoryDAO storyDAO;
+
+    public StatusService(DatabaseFactory databaseFactory)
+    {
+        super(databaseFactory);
+        feedDAO = databaseFactory.getFeedDAO();
+        storyDAO = databaseFactory.getStoryDAO();
+    }
+
+    // Needs to add status to user story, get all followers, add status to their feeds
     public PostStatusResponse postStatus(PostStatusRequest request)
     {
         return getStatusDAO().postStatus(request);
@@ -17,16 +28,26 @@ public class StatusService
 
     public GetStoryResponse getStory(GetStoryRequest request)
     {
-        return getStatusDAO().getStory(request);
+        return getStoryDAO().getStory(request);
     }
 
     public GetFeedResponse getFeed(GetFeedRequest request)
     {
-        return getStatusDAO().getFeed(request);
+        return getFeedDao().getFeed(request);
     }
 
     public StatusDAO getStatusDAO()
     {
         return new StatusDAO();
+    }
+
+    public BaseService.FeedDAO getFeedDao()
+    {
+        return feedDAO;
+    }
+
+    public BaseService.StoryDAO getStoryDAO()
+    {
+        return storyDAO;
     }
 }

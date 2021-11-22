@@ -21,12 +21,14 @@ import edu.byu.cs.tweeter.model.net.response.GetFollowersResponse;
 import edu.byu.cs.tweeter.model.net.response.GetFollowingCountResponse;
 import edu.byu.cs.tweeter.model.net.response.GetFollowingResponse;
 import edu.byu.cs.tweeter.model.net.response.UnFollowResponse;
+import edu.byu.cs.tweeter.server.service.BaseService;
 import edu.byu.cs.tweeter.server.util.FakeData;
 
 /**
  * A DAO for accessing 'following' data from the database.
  */
-public class FollowDAO {
+public class FollowDAODynamo implements BaseService.FollowDAO
+{
 
     public GetFollowingCountResponse getFollowingCount(GetFollowingCountRequest request) {
         // TODO: uses the dummy data.  Replace with a real implementation.

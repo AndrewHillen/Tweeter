@@ -7,6 +7,7 @@ import edu.byu.cs.tweeter.model.net.request.GetFollowerCountRequest;
 import edu.byu.cs.tweeter.model.net.request.GetFollowingCountRequest;
 import edu.byu.cs.tweeter.model.net.response.GetFollowerCountResponse;
 import edu.byu.cs.tweeter.model.net.response.GetFollowingCountResponse;
+import edu.byu.cs.tweeter.server.dao.DynamoDAOFactory;
 import edu.byu.cs.tweeter.server.service.FollowService;
 
 public class GetFollowerCountHandler extends AuthorizationHandler<GetFollowerCountRequest> implements RequestHandler<GetFollowerCountRequest, GetFollowerCountResponse>
@@ -14,6 +15,7 @@ public class GetFollowerCountHandler extends AuthorizationHandler<GetFollowerCou
     @Override
     public GetFollowerCountResponse handleRequest(GetFollowerCountRequest request, Context context)
     {
-        return new FollowService().getFollowerCount(request);
+        FollowService service = new FollowService(new DynamoDAOFactory());
+        return service.getFollowerCount(request);
     }
 }

@@ -9,9 +9,10 @@ import edu.byu.cs.tweeter.model.net.request.RegisterRequest;
 import edu.byu.cs.tweeter.model.net.response.AuthenticateResponse;
 import edu.byu.cs.tweeter.model.net.response.GetUserResponse;
 import edu.byu.cs.tweeter.model.net.response.LogoutResponse;
+import edu.byu.cs.tweeter.server.service.BaseService;
 import edu.byu.cs.tweeter.server.util.FakeData;
 
-public class UserDAO
+public class UserDAODynamo implements BaseService.UserDAO
 {
     public boolean checkAuthorization(AuthToken authToken)
     {

@@ -7,6 +7,7 @@ import edu.byu.cs.tweeter.model.net.request.FollowingRequest;
 import edu.byu.cs.tweeter.model.net.request.GetFollowingRequest;
 import edu.byu.cs.tweeter.model.net.response.FollowingResponse;
 import edu.byu.cs.tweeter.model.net.response.GetFollowingResponse;
+import edu.byu.cs.tweeter.server.dao.DynamoDAOFactory;
 import edu.byu.cs.tweeter.server.service.FollowService;
 
 /**
@@ -17,11 +18,11 @@ public class GetFollowingHandler extends AuthorizationHandler<GetFollowingReques
     @Override
     public GetFollowingResponse handleRequest(GetFollowingRequest request, Context context)
     {
-        if(!checkAuthorization(request.getAuthToken()))
+        if(!checkAuthorization(request.getAuthToken(), request.getUserAlias()))
         {
             return badTokenResponse(new GetFollowingResponse(null));
         }
-        FollowService service = new FollowService();
+        FollowService service = new FollowService(new DynamoDAOFactory());
         return service.getFollowing(request);
     }
 
