@@ -32,7 +32,7 @@ public class GetFollowersTask extends PagedTask<User> {
     @Override
     public boolean runTask() throws Exception
     {
-        GetFollowersRequest request = new GetFollowersRequest(authToken, targetUser, lastItem, limit);
+        GetFollowersRequest request = new GetFollowersRequest(authToken, userAlias, targetUser, lastItem, limit);
         GetFollowersResponse response = getServerFacade().getFollowers(request);
 
         items = response.getItems();

@@ -23,7 +23,7 @@ public class UnfollowTask extends AuthenticatedTask {
     private User followee;
 
 
-    public UnfollowTask(AuthToken authToken,User loggedInUser, User followee, Handler messageHandler) {
+    public UnfollowTask(AuthToken authToken, User loggedInUser, User followee, Handler messageHandler) {
         super(messageHandler, authToken);
         this.followee = followee;
         this.loggedInUser = loggedInUser;

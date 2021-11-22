@@ -33,7 +33,7 @@ public class GetStoryTask extends PagedTask<Status> {
     @Override
     public boolean runTask() throws Exception
     {
-        GetStoryRequest request = new GetStoryRequest(authToken, targetUser, lastItem, limit);
+        GetStoryRequest request = new GetStoryRequest(authToken, userAlias, targetUser, lastItem, limit);
 
         GetStoryResponse response = getServerFacade().getStory(request);
 

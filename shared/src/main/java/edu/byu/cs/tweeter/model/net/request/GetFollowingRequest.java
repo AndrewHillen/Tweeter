@@ -9,8 +9,8 @@ public class GetFollowingRequest extends PagedRequest<User>
     {
     }
 
-    public GetFollowingRequest(AuthToken authToken, User targetUser, User lastItem, int limit)
+    public GetFollowingRequest(AuthToken authToken, String userAlias, User targetUser, User lastItem, int limit)
     {
-        super(authToken, targetUser, lastItem, limit);
+        super(authToken, userAlias, targetUser, lastItem, limit);
     }
 }

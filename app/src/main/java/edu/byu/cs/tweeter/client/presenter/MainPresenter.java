@@ -217,7 +217,7 @@ public class MainPresenter extends BasePresenter<MainPresenter.View>
     public void logout()
     {
         view.displayInfoMessage("Logging Out...");
-        new UserService().logout(authToken, logoutObserver);
+        new UserService().logout(authToken, loggedInUser.getAlias(), logoutObserver);
     }
 
     // Follow User

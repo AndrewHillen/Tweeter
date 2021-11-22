@@ -14,9 +14,9 @@ public class PagedRequest<T> extends AuthenticatedRequest
     {
     }
 
-    public PagedRequest(AuthToken authToken, User targetUser, T lastItem, int limit)
+    public PagedRequest(AuthToken authToken, String userAlias, User targetUser, T lastItem, int limit)
     {
-        super(authToken);
+        super(authToken, userAlias);
         this.targetUser = targetUser;
         this.lastItem = lastItem;
         this.limit = limit;

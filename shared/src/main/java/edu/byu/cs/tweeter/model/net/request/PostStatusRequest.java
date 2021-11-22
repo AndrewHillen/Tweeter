@@ -13,7 +13,7 @@ public class PostStatusRequest extends AuthenticatedRequest
 
     public PostStatusRequest(AuthToken authToken, Status status)
     {
-        super(authToken);
+        super(authToken, status.getUser().getAlias());
         this.status = status;
     }
 

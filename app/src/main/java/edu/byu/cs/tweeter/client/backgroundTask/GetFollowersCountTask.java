@@ -23,7 +23,7 @@ public class GetFollowersCountTask extends GetCountTask {
     @Override
     protected boolean fetchCount() throws Exception
     {
-        GetFollowerCountRequest request = new GetFollowerCountRequest(authToken, targetUser);
+        GetFollowerCountRequest request = new GetFollowerCountRequest(authToken, userAlias, targetUser);
         GetFollowerCountResponse response = getServerFacade().getFollowerCount(request);
         count = response.getCount();
         return true;

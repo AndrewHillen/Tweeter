@@ -9,8 +9,8 @@ public class GetFollowerCountRequest extends GetCountRequest
     {
     }
 
-    public GetFollowerCountRequest(AuthToken authToken, User targetUser)
+    public GetFollowerCountRequest(AuthToken authToken, String userAlias, User targetUser)
     {
-        super(authToken, targetUser);
+        super(authToken, userAlias, targetUser);
     }
 }

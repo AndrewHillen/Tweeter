@@ -25,7 +25,7 @@ public class GetFollowingCountTask extends GetCountTask {
     @Override
     protected boolean fetchCount() throws Exception
     {
-        GetFollowingCountRequest request = new GetFollowingCountRequest(authToken, targetUser);
+        GetFollowingCountRequest request = new GetFollowingCountRequest(authToken, userAlias, targetUser);
         GetFollowingCountResponse response = getServerFacade().getFollowingCount(request);
         count = response.getCount();
         return true;

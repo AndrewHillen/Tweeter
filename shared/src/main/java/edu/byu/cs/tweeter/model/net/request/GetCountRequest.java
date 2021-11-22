@@ -11,9 +11,9 @@ public class GetCountRequest extends AuthenticatedRequest
     {
     }
 
-    public GetCountRequest(AuthToken authToken, User targetUser)
+    public GetCountRequest(AuthToken authToken, String userAlias, User targetUser)
     {
-        super(authToken);
+        super(authToken, userAlias);
         this.targetUser = targetUser;
     }
 
