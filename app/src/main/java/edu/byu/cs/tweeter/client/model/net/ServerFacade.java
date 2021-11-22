@@ -6,7 +6,6 @@ import edu.byu.cs.tweeter.model.net.TweeterRemoteException;
 import edu.byu.cs.tweeter.model.net.request.AuthenticatedRequest;
 import edu.byu.cs.tweeter.model.net.request.CheckFollowRequest;
 import edu.byu.cs.tweeter.model.net.request.FollowRequest;
-import edu.byu.cs.tweeter.model.net.request.FollowingRequest;
 import edu.byu.cs.tweeter.model.net.request.GetFeedRequest;
 import edu.byu.cs.tweeter.model.net.request.GetFollowerCountRequest;
 import edu.byu.cs.tweeter.model.net.request.GetFollowersRequest;
@@ -21,7 +20,6 @@ import edu.byu.cs.tweeter.model.net.request.RegisterRequest;
 import edu.byu.cs.tweeter.model.net.request.UnFollowRequest;
 import edu.byu.cs.tweeter.model.net.response.CheckFollowResponse;
 import edu.byu.cs.tweeter.model.net.response.FollowResponse;
-import edu.byu.cs.tweeter.model.net.response.FollowingResponse;
 import edu.byu.cs.tweeter.model.net.response.AuthenticateResponse;
 import edu.byu.cs.tweeter.model.net.response.GetFeedResponse;
 import edu.byu.cs.tweeter.model.net.response.GetFollowerCountResponse;
@@ -123,22 +121,22 @@ public class ServerFacade {
 
     // Follows stuff -------------------------------------------------------------------------------------------
 
-    /**
-     * Returns the users that the user specified in the request is following. Uses information in
-     * the request object to limit the number of followees returned and to return the next set of
-     * followees after any that were returned in a previous request.
-     *
-     * @param request contains information about the user whose followees are to be returned and any
-     *                other information required to satisfy the request.
-     * @return the followees.
-     */
-    public FollowingResponse getFollowees(FollowingRequest request, String urlPath)
-            throws IOException, TweeterRemoteException {
-
-        FollowingResponse response = clientCommunicator.doPost(urlPath, request, null, FollowingResponse.class);
-
-        return handleResponse(response);
-    }
+//    /**
+//     * Returns the users that the user specified in the request is following. Uses information in
+//     * the request object to limit the number of followees returned and to return the next set of
+//     * followees after any that were returned in a previous request.
+//     *
+//     * @param request contains information about the user whose followees are to be returned and any
+//     *                other information required to satisfy the request.
+//     * @return the followees.
+//     */
+//    public FollowingResponse getFollowees(FollowingRequest request, String urlPath)
+//            throws IOException, TweeterRemoteException {
+//
+//        FollowingResponse response = clientCommunicator.doPost(urlPath, request, null, FollowingResponse.class);
+//
+//        return handleResponse(response);
+//    }
 
     public GetFollowerCountResponse getFollowerCount(GetFollowerCountRequest request) throws IOException, TweeterRemoteException
     {
