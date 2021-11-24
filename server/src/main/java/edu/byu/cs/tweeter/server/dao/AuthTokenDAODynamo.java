@@ -1,6 +1,7 @@
 package edu.byu.cs.tweeter.server.dao;
 
 import java.util.Date;
+import java.util.UUID;
 
 import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.net.request.LogoutRequest;
@@ -17,7 +18,14 @@ public class AuthTokenDAODynamo implements BaseService.AuthTokenDAO
     @Override
     public AuthToken generateAuthToken(String userHandle)
     {
-        return new AuthToken("Token", Long.toString(new Date().getTime()));
+        String token = UUID.randomUUID().toString();
+        long timestamp = new Date().getTime();
+
+
+
+        String timestampString = Long.toString(timestamp);
+        return new AuthToken(token, timestampString);
+        //Need to stuff token in here as well
     }
 
     @Override

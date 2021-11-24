@@ -1,5 +1,12 @@
 package edu.byu.cs.tweeter.server.dao;
 
+import com.amazonaws.services.dynamodbv2.document.Item;
+import com.amazonaws.services.dynamodbv2.document.PrimaryKey;
+import com.amazonaws.services.dynamodbv2.document.spec.GetItemSpec;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.User;
 import edu.byu.cs.tweeter.model.net.request.GetUserRequest;
@@ -11,6 +18,8 @@ import edu.byu.cs.tweeter.model.net.response.GetUserResponse;
 import edu.byu.cs.tweeter.model.net.response.LogoutResponse;
 import edu.byu.cs.tweeter.server.service.BaseService;
 import edu.byu.cs.tweeter.server.util.FakeData;
+import edu.byu.cs.tweeter.util.JsonSerializer;
+import edu.byu.cs.tweeter.util.Pair;
 
 public class UserDAODynamo implements BaseService.UserDAO
 {
@@ -19,20 +28,43 @@ public class UserDAODynamo implements BaseService.UserDAO
         return true;
     }
 
-    public AuthenticateResponse login(LoginRequest request) {
+    public User login(LoginRequest request) {
 
-        // TODO: Generates dummy data. Replace with a real implementation.
-        User user = getDummyUser();
-        AuthToken authToken = getDummyAuthToken();
-        return new AuthenticateResponse(user, authToken);
+        Pair<User, String> pair = getUser(request.getUsername());
+        User user = pair.getFirst();
+        //TODO hash this.
+        String password = pair.getSecond();
+
+        if(request.getPassword().equals(password))
+        {
+            return user;
+        }
+        System.out.println("User was null");
+        return null;
+
     }
 
-    public AuthenticateResponse register(RegisterRequest request) {
+    public User register(RegisterRequest request) {
+
+        DynamoUtils dynamoUtils = new DynamoUtils("User");
+
+        //TODO Add re-register protection.
+        User user = new User(request.getFirstName(), request.getLastName(), request.getUsername(), null);
+
+        ImageUtil.uploadImage(request.getImage(), user.getAlias());
+
+
+        //TODO Hash this.
+        Item item = new Item()
+                .withPrimaryKey("UserAlias", request.getUsername())
+                .withString("Password", request.getPassword())
+                .withJSON("UserInfo", JsonSerializer.serialize(user));
+
+        dynamoUtils.put(item);
 
         // TODO: Generates dummy data. Replace with a real implementation.
-        User user = getDummyUser();
-        AuthToken authToken = getDummyAuthToken();
-        return new AuthenticateResponse(user, authToken);
+        user.setImageUrl(ImageUtil.getURL(request.getUsername()));
+        return user;
     }
 
     public LogoutResponse logout(LogoutRequest request)
@@ -42,9 +74,39 @@ public class UserDAODynamo implements BaseService.UserDAO
 
     public GetUserResponse getUser(GetUserRequest request)
     {
-        User user = getFakeData().findUserByAlias(request.getAlias());
+        User user = getUser(request.getAlias()).getFirst();
+
+
         return new GetUserResponse(user);
     }
+
+    private Pair<User, String> getUser(String alias)
+    {
+
+        DynamoUtils dynamoUtils = new DynamoUtils("User");
+        GetItemSpec getItemSpec = new GetItemSpec().withPrimaryKey( new PrimaryKey("UserAlias", alias));
+        Item item = dynamoUtils.get(getItemSpec);
+
+        User user = null;
+        String password = "";
+
+        try
+        {
+            String json = item.getJSON("UserInfo");
+            password = JsonSerializer.deserialize(item.getJSON("Password"), String.class);
+            user = JsonSerializer.deserialize(json, User.class);
+            user.setImageUrl(ImageUtil.getURL(alias));
+        }
+        catch (Exception ex)
+        {
+            System.out.println("GetUser messed up");
+            ex.printStackTrace();
+            //Do something with this later
+        }
+        return new Pair<User, String>(user, password);
+    }
+
+
 
 
 
