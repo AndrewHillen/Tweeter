@@ -13,10 +13,15 @@ public class LogoutHandler extends AuthorizationHandler<LogoutRequest> implement
     @Override
     public LogoutResponse handleRequest(LogoutRequest request, Context context)
     {
+        if(request.getAuthToken() == null)
+        {
+            System.out.println("Null AuthToken not serialized");
+        }
         if(!checkAuthorization(request.getAuthToken(), request.getUserAlias()))
         {
             return badTokenResponse(new LogoutResponse(false));
         }
+        System.out.println("I make it here 1");
         UserService userService = new UserService(new DynamoDAOFactory());
         return userService.logout(request);
 

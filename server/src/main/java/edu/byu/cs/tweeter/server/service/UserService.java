@@ -39,13 +39,18 @@ public class UserService extends BaseService {
     public AuthenticateResponse register(RegisterRequest request)
     {
         User user = getUserDAO().register(request);
-        AuthToken authToken = getAuthTokenDAO().generateAuthToken(user.getAlias());
-        return new AuthenticateResponse(user, authToken);
+        if(user != null)
+        {
+            AuthToken authToken = getAuthTokenDAO().generateAuthToken(user.getAlias());
+            return new AuthenticateResponse(user, authToken);
+        }
+
+        return new AuthenticateResponse("Username already exists");
     }
 
     public LogoutResponse logout(LogoutRequest request)
     {
-        return getUserDAO().logout(request);
+        return getAuthTokenDAO().logout(request);
     }
 
     public GetUserResponse getUser(GetUserRequest request)

@@ -23,6 +23,7 @@ import edu.byu.cs.tweeter.util.Pair;
 
 public class UserDAODynamo implements BaseService.UserDAO
 {
+    String USER_TABLE = "User";
     public boolean checkAuthorization(AuthToken authToken)
     {
         return true;
@@ -46,7 +47,13 @@ public class UserDAODynamo implements BaseService.UserDAO
 
     public User register(RegisterRequest request) {
 
-        DynamoUtils dynamoUtils = new DynamoUtils("User");
+        Pair<User, String> pair = getUser(request.getUsername());
+        User checkUser = pair.getFirst();
+        if(checkUser != null)
+        {
+            return null;
+        }
+        DynamoUtils dynamoUtils = new DynamoUtils(USER_TABLE);
 
         //TODO Add re-register protection.
         User user = new User(request.getFirstName(), request.getLastName(), request.getUsername(), null);
@@ -83,7 +90,7 @@ public class UserDAODynamo implements BaseService.UserDAO
     private Pair<User, String> getUser(String alias)
     {
 
-        DynamoUtils dynamoUtils = new DynamoUtils("User");
+        DynamoUtils dynamoUtils = new DynamoUtils(USER_TABLE);
         GetItemSpec getItemSpec = new GetItemSpec().withPrimaryKey( new PrimaryKey("UserAlias", alias));
         Item item = dynamoUtils.get(getItemSpec);
 

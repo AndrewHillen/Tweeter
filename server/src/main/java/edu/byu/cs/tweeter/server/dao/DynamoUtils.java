@@ -5,6 +5,7 @@ import com.amazonaws.services.dynamodbv2.document.DynamoDB;
 import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.document.PutItemOutcome;
 import com.amazonaws.services.dynamodbv2.document.Table;
+import com.amazonaws.services.dynamodbv2.document.spec.DeleteItemSpec;
 import com.amazonaws.services.dynamodbv2.document.spec.GetItemSpec;
 
 public class DynamoUtils
@@ -53,5 +54,19 @@ public class DynamoUtils
             ex.printStackTrace();
         }
         return null;
+    }
+
+    public void delete(DeleteItemSpec spec)
+    {
+        try
+        {
+            System.out.println(spec.getKeyComponents().toString());
+            table.deleteItem(spec);
+        }
+        catch (Exception ex)
+        {
+            System.out.println("Something else screwed up");
+            ex.printStackTrace();
+        }
     }
 }
