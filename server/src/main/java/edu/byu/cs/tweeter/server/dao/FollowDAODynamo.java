@@ -1,5 +1,10 @@
 package edu.byu.cs.tweeter.server.dao;
 
+import com.amazonaws.services.dynamodbv2.document.Item;
+import com.amazonaws.services.dynamodbv2.document.PrimaryKey;
+import com.amazonaws.services.dynamodbv2.document.spec.DeleteItemSpec;
+import com.amazonaws.services.dynamodbv2.document.spec.GetItemSpec;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -21,6 +26,7 @@ import edu.byu.cs.tweeter.model.net.response.GetFollowingResponse;
 import edu.byu.cs.tweeter.model.net.response.UnFollowResponse;
 import edu.byu.cs.tweeter.server.service.BaseService;
 import edu.byu.cs.tweeter.server.util.FakeData;
+import edu.byu.cs.tweeter.util.JsonSerializer;
 
 /**
  * A DAO for accessing 'following' data from the database.
@@ -28,29 +34,66 @@ import edu.byu.cs.tweeter.server.util.FakeData;
 public class FollowDAODynamo implements BaseService.FollowDAO
 {
 
-    public GetFollowingCountResponse getFollowingCount(GetFollowingCountRequest request) {
-        // TODO: uses the dummy data.  Replace with a real implementation.
-        return new GetFollowingCountResponse(getDummyFollowees().size());
-    }
-
-    public GetFollowerCountResponse getFollowerCount(GetFollowerCountRequest request) {
-        // TODO: uses the dummy data.  Replace with a real implementation.
-        return new GetFollowerCountResponse(getDummyFollowees().size());
-    }
+    String FOLLOW_TABLE = "follows";
+    String FOLLOWS_INDEX = "follows_index";
+    String PARTITION_KEY = "follower_handle";
+    String SORT_KEY = "followee_handle";
+    String FOLLOWEE_ATTRIBUTE = "followee_info";
+    String FOLLOWER_ATTRIBUTE = "follower_info";
 
     public FollowResponse follow(FollowRequest request)
     {
+        User followee = request.getTargetUser();
+        followee.setImageBytes(null);
+        User follower = request.getFollower();
+        follower.setImageBytes(null);
+        String followee_handle = followee.getAlias();
+        String follower_handle = follower.getAlias();
+
+        Item item = new Item()
+                .withPrimaryKey(PARTITION_KEY, follower_handle, SORT_KEY, followee_handle)
+                .withJSON(FOLLOWER_ATTRIBUTE, JsonSerializer.serialize(follower))
+                .withJSON(FOLLOWEE_ATTRIBUTE, JsonSerializer.serialize(followee));
+
+        DynamoUtils dynamoUtils = new DynamoUtils(FOLLOW_TABLE);
+
+        dynamoUtils.put(item);
+
         return new FollowResponse(true);
+
     }
 
     public UnFollowResponse unfollow(UnFollowRequest request)
     {
+        User followee = request.getTargetUser();
+        User follower = request.getFollower();
+        String followee_handle = followee.getAlias();
+        String follower_handle = follower.getAlias();
+        DeleteItemSpec deleteItemSpec = new DeleteItemSpec()
+                .withPrimaryKey(PARTITION_KEY, follower_handle, SORT_KEY, followee_handle);
+
+        DynamoUtils dynamoUtils = new DynamoUtils(FOLLOW_TABLE);
+
+        dynamoUtils.delete(deleteItemSpec);
+
         return new UnFollowResponse(true);
     }
 
     public CheckFollowResponse checkFollow(CheckFollowRequest request)
     {
-        return new CheckFollowResponse(new Random().nextInt() > 0);
+        DynamoUtils dynamoUtils = new DynamoUtils(FOLLOW_TABLE);
+        String follower = request.getUserAlias();
+        String followee = request.getTargetHandle();
+        GetItemSpec spec = new GetItemSpec()
+                .withPrimaryKey(new PrimaryKey(PARTITION_KEY, follower, SORT_KEY, followee));
+
+        Item item = dynamoUtils.get(spec);
+
+        if(item != null)
+        {
+            return new CheckFollowResponse(true);
+        }
+        return new CheckFollowResponse(false);
     }
 
 

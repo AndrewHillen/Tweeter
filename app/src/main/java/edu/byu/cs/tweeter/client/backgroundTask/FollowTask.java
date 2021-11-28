@@ -35,7 +35,7 @@ public class FollowTask extends AuthenticatedTask {
 
     @Override
     public boolean runTask() throws Exception{
-        FollowRequest request = new FollowRequest(authToken, loggedInUser.getAlias(), followee.getAlias());
+        FollowRequest request = new FollowRequest(authToken, loggedInUser.getAlias(), followee, loggedInUser);
         FollowResponse response = getServerFacade().follow(request);
         // Add functionality later
         return true;

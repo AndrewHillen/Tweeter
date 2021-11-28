@@ -1,5 +1,6 @@
 package edu.byu.cs.tweeter.server.service;
 
+import edu.byu.cs.tweeter.model.domain.User;
 import edu.byu.cs.tweeter.model.net.request.CheckFollowRequest;
 import edu.byu.cs.tweeter.model.net.request.FollowRequest;
 import edu.byu.cs.tweeter.model.net.request.GetFollowerCountRequest;
@@ -22,11 +23,13 @@ import edu.byu.cs.tweeter.server.dao.FollowDAODynamo;
 public class FollowService extends BaseService {
 
     FollowDAO followDAO;
+    UserDAO userDAO;
 
     public FollowService(DatabaseFactory databaseFactory)
     {
         super(databaseFactory);
         this.followDAO = databaseFactory.getFollowDAO();
+        this.userDAO = databaseFactory.getUserDAO();
 
     }
     /**
@@ -48,21 +51,32 @@ public class FollowService extends BaseService {
 
     public GetFollowingCountResponse getFollowingCount(GetFollowingCountRequest request)
     {
-        return getFollowingDAO().getFollowingCount(request);
+        int count = getUserDAO().getFollowingCount(request.getTargetUser().getAlias());
+        return new GetFollowingCountResponse(count);
     }
 
     public GetFollowerCountResponse getFollowerCount(GetFollowerCountRequest request)
     {
-        return getFollowingDAO().getFollowerCount(request);
+        int count = getUserDAO().getFollowerCount(request.getTargetUser().getAlias());
+        return new GetFollowerCountResponse(count);
     }
 
     public FollowResponse follow(FollowRequest request)
     {
+        User followee = request.getTargetUser();
+        User follower = request.getFollower();
+        getUserDAO().incrementFollowingCount(follower.getAlias());
+        getUserDAO().incrementFollowerCount(followee.getAlias());
         return getFollowingDAO().follow(request);
     }
 
     public UnFollowResponse unfollow(UnFollowRequest request)
     {
+        //Decrement count by 1 (user table probably)
+        User followee = request.getTargetUser();
+        User follower = request.getFollower();
+        getUserDAO().decrementFollowingCount(follower.getAlias());
+        getUserDAO().decrementFollowerCount(followee.getAlias());
         return getFollowingDAO().unfollow(request);
     }
 
@@ -81,4 +95,10 @@ public class FollowService extends BaseService {
     FollowDAO getFollowingDAO() {
         return followDAO;
     }
+
+    UserDAO getUserDAO()
+    {
+        return userDAO;
+    }
+
 }

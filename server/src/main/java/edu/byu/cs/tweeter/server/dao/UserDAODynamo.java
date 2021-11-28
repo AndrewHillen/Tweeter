@@ -24,6 +24,12 @@ import edu.byu.cs.tweeter.util.Pair;
 public class UserDAODynamo implements BaseService.UserDAO
 {
     String USER_TABLE = "User";
+    String PARTITION_KEY = "UserAlias";
+    String PASSWORD_ATTRIBUTE = "Password";
+    String USER_INFO_ATTRIBUTE = "UserInfo";
+    String FOLLOWER_COUNT_ATTRIBUTE = "follower_count";
+    String FOLLOWING_COUNT_ATTRIBUTE = "following_count";
+
     public boolean checkAuthorization(AuthToken authToken)
     {
         return true;
@@ -65,9 +71,11 @@ public class UserDAODynamo implements BaseService.UserDAO
 
         //TODO Hash this.
         Item item = new Item()
-                .withPrimaryKey("UserAlias", request.getUsername())
-                .withString("Password", request.getPassword())
-                .withJSON("UserInfo", JsonSerializer.serialize(user));
+                .withPrimaryKey(PARTITION_KEY, request.getUsername())
+                .withString(PASSWORD_ATTRIBUTE, request.getPassword())
+                .withJSON(USER_INFO_ATTRIBUTE, JsonSerializer.serialize(user))
+                .withInt(FOLLOWER_COUNT_ATTRIBUTE, 0)
+                .withInt(FOLLOWING_COUNT_ATTRIBUTE, 0);
 
         dynamoUtils.put(item);
 
@@ -87,12 +95,75 @@ public class UserDAODynamo implements BaseService.UserDAO
         return new GetUserResponse(user);
     }
 
+    public void incrementFollowerCount(String alias)
+    {
+        incrementCount(FOLLOWER_COUNT_ATTRIBUTE, alias);
+    }
+
+    public void decrementFollowerCount(String alias)
+    {
+        decrementCount(FOLLOWER_COUNT_ATTRIBUTE, alias);
+    }
+
+    public int getFollowerCount(String alias)
+    {
+        return getCount(FOLLOWER_COUNT_ATTRIBUTE, alias);
+    }
+
+    public void incrementFollowingCount(String alias)
+    {
+        incrementCount(FOLLOWING_COUNT_ATTRIBUTE, alias);
+    }
+
+    public void decrementFollowingCount(String alias)
+    {
+        decrementCount(FOLLOWING_COUNT_ATTRIBUTE, alias);
+    }
+
+    public int getFollowingCount(String alias)
+    {
+        return getCount(FOLLOWING_COUNT_ATTRIBUTE, alias);
+    }
+
+    private void incrementCount(String attribute, String alias)
+    {
+        DynamoUtils dynamoUtils = new DynamoUtils(USER_TABLE);
+        Item item = getUserItem(alias);
+
+        item.withInt(attribute, item.getInt(attribute) + 1);
+
+        dynamoUtils.put(item);
+    }
+
+    private void decrementCount(String attribute, String alias)
+    {
+        DynamoUtils dynamoUtils = new DynamoUtils(USER_TABLE);
+        Item item = getUserItem(alias);
+
+        item.withInt(attribute, item.getInt(attribute) - 1);
+
+        dynamoUtils.put(item);
+    }
+
+    private int getCount(String attribute, String alias)
+    {
+        Item item = getUserItem(alias);
+        return item.getInt(attribute);
+    }
+
+    private Item getUserItem(String alias)
+    {
+        DynamoUtils dynamoUtils = new DynamoUtils(USER_TABLE);
+        GetItemSpec getItemSpec = new GetItemSpec().withPrimaryKey( new PrimaryKey(PARTITION_KEY, alias));
+        Item item = dynamoUtils.get(getItemSpec);
+
+        return item;
+    }
+
     private Pair<User, String> getUser(String alias)
     {
 
-        DynamoUtils dynamoUtils = new DynamoUtils(USER_TABLE);
-        GetItemSpec getItemSpec = new GetItemSpec().withPrimaryKey( new PrimaryKey("UserAlias", alias));
-        Item item = dynamoUtils.get(getItemSpec);
+        Item item = getUserItem(alias);
 
         User user = null;
         String password = "";

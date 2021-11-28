@@ -64,8 +64,6 @@ public class BaseService
 
     public interface FollowDAO
     {
-        GetFollowingCountResponse getFollowingCount(GetFollowingCountRequest request);
-        GetFollowerCountResponse getFollowerCount(GetFollowerCountRequest request);
         FollowResponse follow(FollowRequest request);
         UnFollowResponse unfollow(UnFollowRequest request);
         CheckFollowResponse checkFollow(CheckFollowRequest request);
@@ -91,5 +89,11 @@ public class BaseService
         User register(RegisterRequest request);
         LogoutResponse logout(LogoutRequest request);
         GetUserResponse getUser(GetUserRequest request);
+        void incrementFollowerCount(String alias);
+        void incrementFollowingCount(String alias);
+        void decrementFollowerCount(String alias);
+        void decrementFollowingCount(String alias);
+        int getFollowerCount(String alias);
+        int getFollowingCount(String alias);
     }
 }

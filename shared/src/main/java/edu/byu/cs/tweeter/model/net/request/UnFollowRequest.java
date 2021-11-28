@@ -1,6 +1,7 @@
 package edu.byu.cs.tweeter.model.net.request;
 
 import edu.byu.cs.tweeter.model.domain.AuthToken;
+import edu.byu.cs.tweeter.model.domain.User;
 
 public class UnFollowRequest extends ChangeFollowRequest
 {
@@ -8,8 +9,8 @@ public class UnFollowRequest extends ChangeFollowRequest
     {
     }
 
-    public UnFollowRequest(AuthToken authToken, String userHandle, String targetHandle)
+    public UnFollowRequest(AuthToken authToken, String userHandle, User targetUser, User follower)
     {
-        super(authToken, userHandle, targetHandle);
+        super(authToken, userHandle, targetUser, follower);
     }
 }
