@@ -32,6 +32,7 @@ public class DynamoUtils
     {
         try
         {
+            System.out.println("Makes into put try");
             PutItemOutcome outcome = table.putItem(item);
         }
         catch (Exception ex)

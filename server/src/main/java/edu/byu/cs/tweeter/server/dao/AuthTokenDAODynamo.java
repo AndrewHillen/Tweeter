@@ -34,7 +34,7 @@ public class AuthTokenDAODynamo implements BaseService.AuthTokenDAO
         Item item = new Item()
                 .withPrimaryKey("Token", token)
                 .withString("Alias", userHandle)
-                .withInt("Timestamp", (int)timestamp);
+                .withLong("Timestamp", timestamp);
 
         dynamoUtils.put(item);
 

@@ -38,6 +38,7 @@ public class UserDAODynamo implements BaseService.UserDAO
 
         if(request.getPassword().equals(password))
         {
+            System.out.println("Match");
             return user;
         }
         System.out.println("User was null");
@@ -56,9 +57,10 @@ public class UserDAODynamo implements BaseService.UserDAO
         DynamoUtils dynamoUtils = new DynamoUtils(USER_TABLE);
 
         //TODO Add re-register protection.
-        User user = new User(request.getFirstName(), request.getLastName(), request.getUsername(), null);
+        ImageUtil.uploadImage(request.getImage(), request.getUsername());
+        User user = new User(request.getFirstName(), request.getLastName(), request.getUsername(), ImageUtil.getURL(request.getUsername()));
 
-        ImageUtil.uploadImage(request.getImage(), user.getAlias());
+
 
 
         //TODO Hash this.
@@ -69,8 +71,6 @@ public class UserDAODynamo implements BaseService.UserDAO
 
         dynamoUtils.put(item);
 
-        // TODO: Generates dummy data. Replace with a real implementation.
-        user.setImageUrl(ImageUtil.getURL(request.getUsername()));
         return user;
     }
 
@@ -102,7 +102,6 @@ public class UserDAODynamo implements BaseService.UserDAO
             String json = item.getJSON("UserInfo");
             password = JsonSerializer.deserialize(item.getJSON("Password"), String.class);
             user = JsonSerializer.deserialize(json, User.class);
-            user.setImageUrl(ImageUtil.getURL(alias));
         }
         catch (Exception ex)
         {
