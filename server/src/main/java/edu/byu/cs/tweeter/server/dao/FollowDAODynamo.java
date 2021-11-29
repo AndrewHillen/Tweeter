@@ -1,11 +1,16 @@
 package edu.byu.cs.tweeter.server.dao;
 
 import com.amazonaws.services.dynamodbv2.document.Item;
+import com.amazonaws.services.dynamodbv2.document.ItemCollection;
 import com.amazonaws.services.dynamodbv2.document.PrimaryKey;
+import com.amazonaws.services.dynamodbv2.document.QueryOutcome;
 import com.amazonaws.services.dynamodbv2.document.spec.DeleteItemSpec;
 import com.amazonaws.services.dynamodbv2.document.spec.GetItemSpec;
+import com.amazonaws.services.dynamodbv2.document.spec.QuerySpec;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
@@ -97,55 +102,149 @@ public class FollowDAODynamo implements BaseService.FollowDAO
     }
 
 
-    public GetFollowersResponse getFollowers(GetFollowersRequest request)
-    {
-        // TODO: Generates dummy data. Replace with a real implementation.
-        assert request.getLimit() > 0;
-        assert request.getTargetUser() != null;
-
-        List<User> allFollowees = getDummyFollowees();
-        List<User> responseFollowees = new ArrayList<>(request.getLimit());
-
-        boolean hasMorePages = false;
-
-        if(request.getLimit() > 0) {
-            if (allFollowees != null) {
-                int followeesIndex = getFolloweesStartingIndex(request.getLastItem(), allFollowees);
-
-                for(int limitCounter = 0; followeesIndex < allFollowees.size() && limitCounter < request.getLimit(); followeesIndex++, limitCounter++) {
-                    responseFollowees.add(allFollowees.get(followeesIndex));
-                }
-
-                hasMorePages = followeesIndex < allFollowees.size();
-            }
-        }
-        return new GetFollowersResponse(responseFollowees, hasMorePages);
-    }
+//    public GetFollowersResponse getFollowers(GetFollowersRequest request)
+//    {
+//        // TODO: Generates dummy data. Replace with a real implementation.
+//        assert request.getLimit() > 0;
+//        assert request.getTargetUser() != null;
+//
+//        List<User> allFollowees = getDummyFollowees();
+//        List<User> responseFollowees = new ArrayList<>(request.getLimit());
+//
+//        boolean hasMorePages = false;
+//
+//        if(request.getLimit() > 0) {
+//            if (allFollowees != null) {
+//                int followeesIndex = getFolloweesStartingIndex(request.getLastItem(), allFollowees);
+//
+//                for(int limitCounter = 0; followeesIndex < allFollowees.size() && limitCounter < request.getLimit(); followeesIndex++, limitCounter++) {
+//                    responseFollowees.add(allFollowees.get(followeesIndex));
+//                }
+//
+//                hasMorePages = followeesIndex < allFollowees.size();
+//            }
+//        }
+//        return new GetFollowersResponse(responseFollowees, hasMorePages);
+//    }
 
     public GetFollowingResponse getFollowing(GetFollowingRequest request)
     {
-        // TODO: Generates dummy data. Replace with a real implementation.
-        assert request.getLimit() > 0;
-        assert request.getTargetUser() != null;
+        DynamoUtils dynamoUtils = new DynamoUtils(FOLLOW_TABLE);
+        User lastUser = request.getLastItem();
+        String follower = request.getTargetUser().getAlias();
 
-        List<User> allFollowees = getDummyFollowees();
-        List<User> responseFollowees = new ArrayList<>(request.getLimit());
+        HashMap<String, String> nameMap = new HashMap<>();
+        nameMap.put("#handle", PARTITION_KEY);
 
+        HashMap<String, Object> valueMap = new HashMap<>();
+        valueMap.put(":handle", follower);
+
+        QuerySpec querySpec = new QuerySpec()
+                .withScanIndexForward(true)
+                .withMaxResultSize(request.getLimit())
+                .withKeyConditionExpression("#handle = :handle")
+                .withNameMap(nameMap)
+                .withValueMap(valueMap);
+
+        if(lastUser != null)
+        {
+            querySpec.withExclusiveStartKey(new PrimaryKey(PARTITION_KEY, follower, SORT_KEY, lastUser.getAlias()));
+        }
+
+        ItemCollection<QueryOutcome> items = dynamoUtils.queryTable(querySpec);
+        Item item = null;
+
+        List<User> users = new ArrayList<>();
+
+        Iterator<Item> iterator = items.iterator();
+        while (iterator.hasNext())
+        {
+            item = iterator.next();
+            User user = JsonSerializer.deserialize(item.getJSON(FOLLOWEE_ATTRIBUTE), User.class);
+            users.add(user);
+        }
         boolean hasMorePages = false;
 
-        if(request.getLimit() > 0) {
-            if (allFollowees != null) {
-                int followeesIndex = getFolloweesStartingIndex(request.getLastItem(), allFollowees);
-
-                for(int limitCounter = 0; followeesIndex < allFollowees.size() && limitCounter < request.getLimit(); followeesIndex++, limitCounter++) {
-                    responseFollowees.add(allFollowees.get(followeesIndex));
-                }
-
-                hasMorePages = followeesIndex < allFollowees.size();
-            }
+        if(items.getLastLowLevelResult().getQueryResult().getLastEvaluatedKey() != null)
+        {
+            hasMorePages = true;
         }
-        return new GetFollowingResponse(responseFollowees, hasMorePages);
+
+        GetFollowingResponse response = new GetFollowingResponse(users, hasMorePages);
+        return response;
     }
+
+    public GetFollowersResponse getFollowers(GetFollowersRequest request)
+    {
+        DynamoUtils dynamoUtils = new DynamoUtils(FOLLOW_TABLE);
+        User lastUser = request.getLastItem();
+        String followee = request.getTargetUser().getAlias();
+
+        HashMap<String, String> nameMap = new HashMap<>();
+        nameMap.put("#handle", SORT_KEY);
+
+        HashMap<String, Object> valueMap = new HashMap<>();
+        valueMap.put(":handle", followee);
+
+        QuerySpec querySpec = new QuerySpec()
+                .withScanIndexForward(true)
+                .withMaxResultSize(request.getLimit())
+                .withKeyConditionExpression("#handle = :handle")
+                .withNameMap(nameMap)
+                .withValueMap(valueMap);
+
+        if(lastUser != null)
+        {
+            querySpec.withExclusiveStartKey(new PrimaryKey(PARTITION_KEY, lastUser.getAlias(), SORT_KEY, followee));
+        }
+
+        ItemCollection<QueryOutcome> items = dynamoUtils.queryIndex(querySpec, FOLLOWS_INDEX);
+        Item item = null;
+
+        List<User> users = new ArrayList<>();
+
+        Iterator<Item> iterator = items.iterator();
+        while (iterator.hasNext())
+        {
+            item = iterator.next();
+            User user = JsonSerializer.deserialize(item.getJSON(FOLLOWER_ATTRIBUTE), User.class);
+            users.add(user);
+        }
+        boolean hasMorePages = false;
+
+        if(items.getLastLowLevelResult().getQueryResult().getLastEvaluatedKey() != null)
+        {
+            hasMorePages = true;
+        }
+
+        GetFollowersResponse response = new GetFollowersResponse(users, hasMorePages);
+        return response;
+    }
+
+//    public GetFollowingResponse getFollowing(GetFollowingRequest request)
+//    {
+//        // TODO: Generates dummy data. Replace with a real implementation.
+//        assert request.getLimit() > 0;
+//        assert request.getTargetUser() != null;
+//
+//        List<User> allFollowees = getDummyFollowees();
+//        List<User> responseFollowees = new ArrayList<>(request.getLimit());
+//
+//        boolean hasMorePages = false;
+//
+//        if(request.getLimit() > 0) {
+//            if (allFollowees != null) {
+//                int followeesIndex = getFolloweesStartingIndex(request.getLastItem(), allFollowees);
+//
+//                for(int limitCounter = 0; followeesIndex < allFollowees.size() && limitCounter < request.getLimit(); followeesIndex++, limitCounter++) {
+//                    responseFollowees.add(allFollowees.get(followeesIndex));
+//                }
+//
+//                hasMorePages = followeesIndex < allFollowees.size();
+//            }
+//        }
+//        return new GetFollowingResponse(responseFollowees, hasMorePages);
+//    }
 
     /**
      * Determines the index for the first followee in the specified 'allFollowees' list that should
