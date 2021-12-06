@@ -91,6 +91,11 @@ public class UserDAODynamo implements BaseService.UserDAO
     {
         User user = getUser(request.getAlias()).getFirst();
 
+        if(user == null)
+        {
+            return new GetUserResponse(false, "User does not exist");
+        }
+
 
         return new GetUserResponse(user);
     }
@@ -164,6 +169,11 @@ public class UserDAODynamo implements BaseService.UserDAO
     {
 
         Item item = getUserItem(alias);
+
+        if(item == null)
+        {
+            return new Pair<>(null, null);
+        }
 
         User user = null;
         String password = "";

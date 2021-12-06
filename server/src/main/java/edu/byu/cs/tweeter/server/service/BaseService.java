@@ -1,6 +1,7 @@
 package edu.byu.cs.tweeter.server.service;
 
 import edu.byu.cs.tweeter.model.domain.AuthToken;
+import edu.byu.cs.tweeter.model.domain.Status;
 import edu.byu.cs.tweeter.model.domain.User;
 import edu.byu.cs.tweeter.model.net.request.CheckFollowRequest;
 import edu.byu.cs.tweeter.model.net.request.FollowRequest;
@@ -67,20 +68,20 @@ public class BaseService
         FollowResponse follow(FollowRequest request);
         UnFollowResponse unfollow(UnFollowRequest request);
         CheckFollowResponse checkFollow(CheckFollowRequest request);
-        GetFollowersResponse getFollowers(GetFollowersRequest request);
-        GetFollowingResponse getFollowing(GetFollowingRequest request);
+        GetFollowersResponse getFollowers(String followee, User lastUser, int limit);
+        GetFollowingResponse getFollowing(String follower, User lastUser, int limit);
     }
 
     public interface FeedDAO
     {
-        PostStatusResponse addToFeed(PostStatusRequest request, String userHandle);
-        GetFeedResponse getFeed(GetFeedRequest request);
+        PostStatusResponse addToFeed(Status status, String userHandle, long timestamp);
+        GetFeedResponse getFeed(String alias, Status lastStatus, int limit);
     }
 
     public interface StoryDAO
     {
-        PostStatusResponse addToStory(PostStatusRequest request, String userHandle);
-        GetStoryResponse getStory(GetStoryRequest request);
+        PostStatusResponse addToStory(Status status, String userHandle, long timestamp);
+        GetStoryResponse getStory(String alias, Status lastStatus, int limit);
     }
 
     public interface UserDAO

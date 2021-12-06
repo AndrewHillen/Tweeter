@@ -32,6 +32,7 @@ public class AuthenticatePresenter<T extends AuthenticateView> extends BasePrese
         public void handleException(Exception ex)
         {
             //Do exception stuff
+            view.displayErrorMessage("Failed to authenticate because of exception: " +ex.getMessage());
         }
     }
 

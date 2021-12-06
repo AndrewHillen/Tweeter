@@ -127,11 +127,9 @@ public class FollowDAODynamo implements BaseService.FollowDAO
 //        return new GetFollowersResponse(responseFollowees, hasMorePages);
 //    }
 
-    public GetFollowingResponse getFollowing(GetFollowingRequest request)
+    public GetFollowingResponse getFollowing(String follower, User lastUser, int limit)
     {
         DynamoUtils dynamoUtils = new DynamoUtils(FOLLOW_TABLE);
-        User lastUser = request.getLastItem();
-        String follower = request.getTargetUser().getAlias();
 
         HashMap<String, String> nameMap = new HashMap<>();
         nameMap.put("#handle", PARTITION_KEY);
@@ -141,7 +139,7 @@ public class FollowDAODynamo implements BaseService.FollowDAO
 
         QuerySpec querySpec = new QuerySpec()
                 .withScanIndexForward(true)
-                .withMaxResultSize(request.getLimit())
+                .withMaxResultSize(limit)
                 .withKeyConditionExpression("#handle = :handle")
                 .withNameMap(nameMap)
                 .withValueMap(valueMap);
@@ -174,11 +172,9 @@ public class FollowDAODynamo implements BaseService.FollowDAO
         return response;
     }
 
-    public GetFollowersResponse getFollowers(GetFollowersRequest request)
+    public GetFollowersResponse getFollowers(String followee, User lastUser, int limit)
     {
         DynamoUtils dynamoUtils = new DynamoUtils(FOLLOW_TABLE);
-        User lastUser = request.getLastItem();
-        String followee = request.getTargetUser().getAlias();
 
         HashMap<String, String> nameMap = new HashMap<>();
         nameMap.put("#handle", SORT_KEY);
@@ -188,7 +184,7 @@ public class FollowDAODynamo implements BaseService.FollowDAO
 
         QuerySpec querySpec = new QuerySpec()
                 .withScanIndexForward(true)
-                .withMaxResultSize(request.getLimit())
+                .withMaxResultSize(limit)
                 .withKeyConditionExpression("#handle = :handle")
                 .withNameMap(nameMap)
                 .withValueMap(valueMap);

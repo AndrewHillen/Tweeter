@@ -56,7 +56,7 @@ public class ServerFacade {
         if(response.isSuccess()) {
             return response;
         } else {
-            throw new RuntimeException(response.getMessage());
+            throw new RuntimeException(response.getErrorMessage());
         }
     }
 

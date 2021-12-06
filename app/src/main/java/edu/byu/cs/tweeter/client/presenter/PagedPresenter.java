@@ -65,6 +65,7 @@ public abstract class PagedPresenter<T extends PagedView, U> extends BasePresent
         @Override
         public void handleException(Exception ex)
         {
+            view.displayErrorMessage("Failed to get user because of exception: " + ex.getMessage());
             //Do Exception stuff
         }
     }

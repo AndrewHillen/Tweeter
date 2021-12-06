@@ -42,11 +42,17 @@ public class FollowService extends BaseService {
      * @return the followees.
      */
     public GetFollowingResponse getFollowing(GetFollowingRequest request) {
-        return getFollowingDAO().getFollowing(request);
+        User lastUser = request.getLastItem();
+        String follower = request.getTargetUser().getAlias();
+        int limit = request.getLimit();
+        return getFollowingDAO().getFollowing(follower, lastUser, limit);
     }
 
     public GetFollowersResponse getFollowers(GetFollowersRequest request) {
-        return getFollowingDAO().getFollowers(request);
+        User lastUser = request.getLastItem();
+        String followee = request.getTargetUser().getAlias();
+        int limit = request.getLimit();
+        return getFollowingDAO().getFollowers(followee, lastUser, limit);
     }
 
     public GetFollowingCountResponse getFollowingCount(GetFollowingCountRequest request)
