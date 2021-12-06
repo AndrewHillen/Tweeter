@@ -35,7 +35,7 @@ public class GetUserTask extends AuthenticatedTask {
 
     @Override
     public boolean runTask() throws Exception{
-        GetUserRequest request = new GetUserRequest(authToken, alias);
+        GetUserRequest request = new GetUserRequest(authToken, userAlias, alias);
 
         GetUserResponse response = getServerFacade().getUser(request);
 

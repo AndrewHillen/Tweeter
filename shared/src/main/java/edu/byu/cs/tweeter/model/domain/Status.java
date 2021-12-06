@@ -29,6 +29,8 @@ public class Status implements Serializable {
      */
     public List<String> mentions;
 
+    public long timestamp;
+
     public Status() {
     }
 
@@ -38,6 +40,15 @@ public class Status implements Serializable {
         this.datetime = datetime;
         this.urls = urls;
         this.mentions = mentions;
+    }
+
+    public Status(String post, User user, String datetime, List<String> urls, List<String> mentions, long timestamp) {
+        this.post = post;
+        this.user = user;
+        this.datetime = datetime;
+        this.urls = urls;
+        this.mentions = mentions;
+        this.timestamp = timestamp;
     }
 
     public void setUser(User user) {
@@ -92,4 +103,13 @@ public class Status implements Serializable {
                 '}';
     }
 
+    public long getTimestamp()
+    {
+        return timestamp;
+    }
+
+    public void setTimestamp(long timestamp)
+    {
+        this.timestamp = timestamp;
+    }
 }

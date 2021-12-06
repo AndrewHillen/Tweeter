@@ -23,7 +23,7 @@ public class UnfollowTask extends AuthenticatedTask {
     private User followee;
 
 
-    public UnfollowTask(AuthToken authToken,User loggedInUser, User followee, Handler messageHandler) {
+    public UnfollowTask(AuthToken authToken, User loggedInUser, User followee, Handler messageHandler) {
         super(messageHandler, authToken);
         this.followee = followee;
         this.loggedInUser = loggedInUser;
@@ -31,7 +31,7 @@ public class UnfollowTask extends AuthenticatedTask {
 
     @Override
     public boolean runTask() throws Exception{
-        UnFollowRequest request = new UnFollowRequest(authToken, loggedInUser.getAlias(), followee.getAlias());
+        UnFollowRequest request = new UnFollowRequest(authToken, loggedInUser.getAlias(), followee, loggedInUser);
         UnFollowResponse response = getServerFacade().unfollow(request);
         // Add functionality later
         return true;

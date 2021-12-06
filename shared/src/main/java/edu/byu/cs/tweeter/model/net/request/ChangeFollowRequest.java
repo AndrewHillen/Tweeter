@@ -1,40 +1,42 @@
 package edu.byu.cs.tweeter.model.net.request;
 
 import edu.byu.cs.tweeter.model.domain.AuthToken;
+import edu.byu.cs.tweeter.model.domain.User;
 
 public class ChangeFollowRequest extends AuthenticatedRequest
 {
-    protected String userHandle;
-    protected String targetHandle;
+    protected User targetUser;
+    protected User follower;
 
     public ChangeFollowRequest()
     {
     }
 
-    public ChangeFollowRequest(AuthToken authToken, String userHandle, String targetHandle)
+    public ChangeFollowRequest(AuthToken authToken, String userHandle, User targetUser, User follower)
     {
-        super(authToken);
-        this.userHandle = userHandle;
-        this.targetHandle = targetHandle;
+        super(authToken, userHandle);
+        this.targetUser = targetUser;
+        this.follower = follower;
     }
 
-    public String getUserHandle()
+
+    public User getTargetUser()
     {
-        return userHandle;
+        return targetUser;
     }
 
-    public void setUserHandle(String userHandle)
+    public void setTargetUser(User targetUser)
     {
-        this.userHandle = userHandle;
+        this.targetUser = targetUser;
     }
 
-    public String getTargetHandle()
+    public User getFollower()
     {
-        return targetHandle;
+        return follower;
     }
 
-    public void setTargetHandle(String targetHandle)
+    public void setFollower(User follower)
     {
-        this.targetHandle = targetHandle;
+        this.follower = follower;
     }
 }

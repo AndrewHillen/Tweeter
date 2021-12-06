@@ -134,9 +134,9 @@ public class UserService extends BaseService
     {
     }
 
-    public void logout(AuthToken authToken, LogoutObserver observer)
+    public void logout(AuthToken authToken, String alias, LogoutObserver observer)
     {
-        LogoutTask logoutTask = new LogoutTask(authToken, new LogoutHandler(observer));
+        LogoutTask logoutTask = new LogoutTask(authToken, alias, new LogoutHandler(observer));
         executeTask(logoutTask);
     }
 

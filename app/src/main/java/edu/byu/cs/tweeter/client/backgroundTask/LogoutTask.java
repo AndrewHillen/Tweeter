@@ -15,14 +15,16 @@ import edu.byu.cs.tweeter.model.net.response.LogoutResponse;
  */
 public class LogoutTask extends AuthenticatedTask {
     private static final String LOG_TAG = "LogoutTask";
+    String alias;
 
-    public LogoutTask(AuthToken authToken, Handler messageHandler) {
+    public LogoutTask(AuthToken authToken, String alias, Handler messageHandler) {
         super(messageHandler, authToken);
+        this.alias = alias;
     }
 
     @Override
     public boolean runTask() throws Exception {
-        LogoutRequest request = new LogoutRequest(authToken);
+        LogoutRequest request = new LogoutRequest(authToken, alias);
 
         LogoutResponse response = getServerFacade().logout(request);
         return response.isSuccess();

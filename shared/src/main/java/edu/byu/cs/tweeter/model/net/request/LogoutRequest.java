@@ -9,8 +9,8 @@ public class LogoutRequest extends AuthenticatedRequest
     {
     }
 
-    public LogoutRequest(AuthToken authToken)
+    public LogoutRequest(AuthToken authToken, String userHandle)
     {
-        super(authToken);
+        super(authToken, userHandle);
     }
 }

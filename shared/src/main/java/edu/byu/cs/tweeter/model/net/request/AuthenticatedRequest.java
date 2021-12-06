@@ -5,14 +5,16 @@ import edu.byu.cs.tweeter.model.domain.AuthToken;
 public class AuthenticatedRequest extends Request
 {
     public AuthToken authToken;
+    public String userAlias;
 
     public AuthenticatedRequest()
     {
     }
 
-    public AuthenticatedRequest(AuthToken authToken)
+    public AuthenticatedRequest(AuthToken authToken, String userAlias)
     {
         this.authToken = authToken;
+        this.userAlias = userAlias;
     }
 
     /**
@@ -31,5 +33,15 @@ public class AuthenticatedRequest extends Request
      */
     public void setAuthToken(AuthToken authToken) {
         this.authToken = authToken;
+    }
+
+    public String getUserAlias()
+    {
+        return userAlias;
+    }
+
+    public void setUserAlias(String userAlias)
+    {
+        this.userAlias = userAlias;
     }
 }

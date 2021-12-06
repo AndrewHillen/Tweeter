@@ -33,7 +33,7 @@ public class GetFeedTask extends PagedTask<Status> {
     @Override
     public boolean runTask() throws Exception
     {
-        GetFeedRequest request = new GetFeedRequest(authToken, targetUser, lastItem, limit);
+        GetFeedRequest request = new GetFeedRequest(authToken, userAlias,  targetUser, lastItem, limit);
 
         GetFeedResponse response = getServerFacade().getFeed(request);
 

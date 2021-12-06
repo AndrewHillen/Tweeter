@@ -5,6 +5,7 @@ import com.amazonaws.services.lambda.runtime.RequestHandler;
 
 import edu.byu.cs.tweeter.model.net.request.FollowRequest;
 import edu.byu.cs.tweeter.model.net.response.FollowResponse;
+import edu.byu.cs.tweeter.server.dao.DynamoDAOFactory;
 import edu.byu.cs.tweeter.server.service.FollowService;
 
 public class FollowHandler extends AuthorizationHandler<FollowRequest> implements RequestHandler<FollowRequest, FollowResponse>
@@ -12,11 +13,11 @@ public class FollowHandler extends AuthorizationHandler<FollowRequest> implement
     @Override
     public FollowResponse handleRequest(FollowRequest request, Context context)
     {
-        if(!checkAuthorization(request.getAuthToken()))
+        if(!checkAuthorization(request.getAuthToken(), request.getUserAlias()))
         {
             return badTokenResponse(new FollowResponse(false));
         }
-        FollowService service = new FollowService();
+        FollowService service = new FollowService(new DynamoDAOFactory());
         return service.follow(request);
     }
 }

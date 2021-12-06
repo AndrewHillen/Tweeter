@@ -10,6 +10,7 @@ import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.net.request.AuthenticateRequest;
 import edu.byu.cs.tweeter.model.net.request.AuthenticatedRequest;
 import edu.byu.cs.tweeter.model.net.response.Response;
+import edu.byu.cs.tweeter.server.dao.DynamoDAOFactory;
 import edu.byu.cs.tweeter.server.service.UserService;
 import edu.byu.cs.tweeter.util.JsonSerializer;
 
@@ -17,9 +18,9 @@ import edu.byu.cs.tweeter.util.JsonSerializer;
 public class AuthorizationHandler<T extends AuthenticatedRequest>
 {
 
-    protected boolean checkAuthorization(AuthToken authToken)
+    protected boolean checkAuthorization(AuthToken authToken, String userHandle)
     {
-        return new UserService().checkAuthorization(authToken);
+        return new UserService(new DynamoDAOFactory()).checkAuthorization(authToken, userHandle);
 
     }
 

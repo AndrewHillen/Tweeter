@@ -10,9 +10,9 @@ public class GetUserRequest extends AuthenticatedRequest
     {
     }
 
-    public GetUserRequest(AuthToken authToken, String alias)
+    public GetUserRequest(AuthToken authToken, String userAlias, String alias)
     {
-        super(authToken);
+        super(authToken, userAlias);
         this.alias = alias;
     }
 

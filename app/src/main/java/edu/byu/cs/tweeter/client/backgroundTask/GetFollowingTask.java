@@ -35,7 +35,7 @@ public class GetFollowingTask extends PagedTask<User> {
 
     @Override
     public boolean runTask() throws Exception {
-        GetFollowingRequest request = new GetFollowingRequest(authToken, targetUser, lastItem, limit);
+        GetFollowingRequest request = new GetFollowingRequest(authToken, userAlias, targetUser, lastItem, limit);
         GetFollowingResponse response = getServerFacade().getFollowing(request);
 
         items = response.getItems();

@@ -59,6 +59,11 @@ public class User implements Comparable<User>, Serializable {
         return alias;
     }
 
+    public void setImageUrl(String imageUrl)
+    {
+        this.imageUrl = imageUrl;
+    }
+
     public String getImageUrl() {
         return imageUrl;
     }
