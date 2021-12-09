@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity implements StatusDialogFragm
     private TextView followeeCount;
     private TextView followerCount;
     private Button followButton;
+    private Toast infoToast;
 
     private MainPresenter presenter;
     private boolean isUser;
@@ -125,7 +126,12 @@ public class MainActivity extends AppCompatActivity implements StatusDialogFragm
     @Override
     public void onStatusPost(String message)
     {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        if(infoToast != null)
+        {
+            infoToast.cancel();
+        }
+        infoToast = Toast.makeText(this, message, Toast.LENGTH_SHORT);
+        infoToast.show();
     }
 
     @Override
@@ -137,7 +143,8 @@ public class MainActivity extends AppCompatActivity implements StatusDialogFragm
     @Override
     public void displayInfoMessage(String message)
     {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        //infoToast = Toast.makeText(this, message, Toast.LENGTH_SHORT);
+        //infoToast.show();
     }
 
     @Override

@@ -25,13 +25,16 @@ public class PostStatusTask extends AuthenticatedTask {
 
     public PostStatusTask(AuthToken authToken, Status status, Handler messageHandler) {
         super(messageHandler, authToken);
+        //status.getUser().setImageBytes(null);
         this.status = status;
     }
 
     @Override
     public boolean runTask() throws Exception{
         PostStatusRequest request = new PostStatusRequest(authToken, status);
+        request.getStatus().getUser().setImageBytes(null);
         PostStatusResponse response = getServerFacade().postStatus(request);
+        BackgroundTaskUtils.loadImage(request.getStatus().getUser());
         return true;
     }
 }

@@ -33,10 +33,19 @@ public class GetFeedTask extends PagedTask<Status> {
     @Override
     public boolean runTask() throws Exception
     {
-        GetFeedRequest request = new GetFeedRequest(authToken, userAlias,  targetUser, lastItem, limit);
+        if(lastItem != null)
+        {
+            lastItem.getUser().setImageBytes(null);
+        }
+        User targetUser2 = new User(targetUser.getFirstName(), targetUser.getLastName(), targetUser.getAlias(), targetUser.getImageUrl());
+        GetFeedRequest request = new GetFeedRequest(authToken, userAlias,  targetUser2, lastItem, limit);
 
         GetFeedResponse response = getServerFacade().getFeed(request);
 
+        if(lastItem != null)
+        {
+            BackgroundTaskUtils.loadImage(lastItem.getUser());
+        }
         items = response.getItems();
         hasMorePages = response.getHasMorePages();
 

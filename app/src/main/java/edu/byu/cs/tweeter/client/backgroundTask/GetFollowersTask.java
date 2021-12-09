@@ -32,8 +32,18 @@ public class GetFollowersTask extends PagedTask<User> {
     @Override
     public boolean runTask() throws Exception
     {
-        GetFollowersRequest request = new GetFollowersRequest(authToken, userAlias, targetUser, lastItem, limit);
+        if(lastItem != null)
+        {
+            lastItem.setImageBytes(null);
+        }
+        User targetUser2 = new User(targetUser.getFirstName(), targetUser.getLastName(), targetUser.getAlias(), targetUser.getImageUrl());
+        GetFollowersRequest request = new GetFollowersRequest(authToken, userAlias, targetUser2, lastItem, limit);
         GetFollowersResponse response = getServerFacade().getFollowers(request);
+
+        if(lastItem != null)
+        {
+            BackgroundTaskUtils.loadImage(lastItem);
+        }
 
         items = response.getItems();
         hasMorePages = response.getHasMorePages();
