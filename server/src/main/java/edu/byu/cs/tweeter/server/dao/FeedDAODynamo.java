@@ -1,10 +1,13 @@
 package edu.byu.cs.tweeter.server.dao;
 
+import com.amazonaws.services.dynamodbv2.document.BatchWriteItemOutcome;
 import com.amazonaws.services.dynamodbv2.document.Item;
 import com.amazonaws.services.dynamodbv2.document.ItemCollection;
 import com.amazonaws.services.dynamodbv2.document.PrimaryKey;
 import com.amazonaws.services.dynamodbv2.document.QueryOutcome;
+import com.amazonaws.services.dynamodbv2.document.TableWriteItems;
 import com.amazonaws.services.dynamodbv2.document.spec.QuerySpec;
+import com.amazonaws.services.dynamodbv2.model.WriteRequest;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,6 +43,55 @@ public class FeedDAODynamo implements BaseService.FeedDAO
         dynamoUtils.put(item);
         return new PostStatusResponse(true);
     }
+//    public PostStatusResponse addToFeed(Status status, String userHandle, long timestamp)
+//    {
+//        DynamoUtils dynamoUtils = new DynamoUtils(FEED_TABLE);
+//        Item item = new Item()
+//                .withPrimaryKey(PARTITION_KEY, userHandle, SORT_KEY, timestamp)
+//                .withJSON(STATUS_ATTRIBUTE, JsonSerializer.serialize(status));
+//
+//        dynamoUtils.put(item);
+//        return new PostStatusResponse(true);
+//    }
+
+    @Override
+    public void batchWritePosts(List<String> userHandles, Status status, long timestamp)
+    {
+        System.out.println("Starting batchWrite");
+        try
+        {
+            TableWriteItems items = new TableWriteItems(FEED_TABLE);
+
+            for (String alias : userHandles)
+            {
+                Item item = new Item()
+                        .withPrimaryKey(PARTITION_KEY, alias, SORT_KEY, timestamp)
+                        .withJSON(STATUS_ATTRIBUTE, JsonSerializer.serialize(status));
+                items.addItemToPut(item);
+            }
+
+            loopBatchWrite(items);
+            items = new TableWriteItems(FEED_TABLE);
+
+            if (items.getItemsToPut() != null && items.getItemsToPut().size() > 0)
+            {
+                loopBatchWrite(items);
+            }
+        }
+        catch (Exception ex)
+        {
+            System.out.println("Batchwrite screwed up");
+            ex.printStackTrace();
+        }
+    }
+
+    private void loopBatchWrite(TableWriteItems items) {
+        DynamoUtils dynamoUtils = new DynamoUtils(FEED_TABLE);
+
+        dynamoUtils.batchWrite(items);
+    }
+
+
 
     public GetFeedResponse getFeed(String alias, Status lastStatus, int limit)
     {

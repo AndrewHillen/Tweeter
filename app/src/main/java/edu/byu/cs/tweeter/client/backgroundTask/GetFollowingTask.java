@@ -35,8 +35,18 @@ public class GetFollowingTask extends PagedTask<User> {
 
     @Override
     public boolean runTask() throws Exception {
-        GetFollowingRequest request = new GetFollowingRequest(authToken, userAlias, targetUser, lastItem, limit);
+        if(lastItem != null)
+        {
+            lastItem.setImageBytes(null);
+        }
+        User targetUser2 = new User(targetUser.getFirstName(), targetUser.getLastName(), targetUser.getAlias(), targetUser.getImageUrl());
+        GetFollowingRequest request = new GetFollowingRequest(authToken, userAlias, targetUser2, lastItem, limit);
         GetFollowingResponse response = getServerFacade().getFollowing(request);
+
+        if(lastItem != null)
+        {
+            BackgroundTaskUtils.loadImage(lastItem);
+        }
 
         items = response.getItems();
         hasMorePages = response.getHasMorePages();

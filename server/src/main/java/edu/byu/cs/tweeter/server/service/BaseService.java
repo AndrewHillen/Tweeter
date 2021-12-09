@@ -1,5 +1,7 @@
 package edu.byu.cs.tweeter.server.service;
 
+import java.util.List;
+
 import edu.byu.cs.tweeter.model.domain.AuthToken;
 import edu.byu.cs.tweeter.model.domain.Status;
 import edu.byu.cs.tweeter.model.domain.User;
@@ -76,6 +78,7 @@ public class BaseService
     {
         PostStatusResponse addToFeed(Status status, String userHandle, long timestamp);
         GetFeedResponse getFeed(String alias, Status lastStatus, int limit);
+        void batchWritePosts(List<String> userHandles, Status status, long timestamp);
     }
 
     public interface StoryDAO

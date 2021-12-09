@@ -33,9 +33,20 @@ public class GetStoryTask extends PagedTask<Status> {
     @Override
     public boolean runTask() throws Exception
     {
-        GetStoryRequest request = new GetStoryRequest(authToken, userAlias, targetUser, lastItem, limit);
+        if(lastItem != null)
+        {
+            lastItem.getUser().setImageBytes(null);
+        }
+        User targetUser2 = new User(targetUser.getFirstName(), targetUser.getLastName(), targetUser.getAlias(), targetUser.getImageUrl());
+        GetStoryRequest request = new GetStoryRequest(authToken, userAlias, targetUser2, lastItem, limit);
 
         GetStoryResponse response = getServerFacade().getStory(request);
+
+        if(lastItem != null)
+        {
+            BackgroundTaskUtils.loadImage(lastItem.getUser());
+        }
+
 
         items = response.getItems();
         hasMorePages = response.getHasMorePages();
