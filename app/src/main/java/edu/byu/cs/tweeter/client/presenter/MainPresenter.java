@@ -91,7 +91,7 @@ public class MainPresenter extends BasePresenter<MainPresenter.View>
         }
     }
 
-    private class PostStatusObserver implements StatusService.PostStatusObserver
+    public class PostStatusObserver implements StatusService.PostStatusObserver
     {
         @Override
         public void handleSuccess()
@@ -178,7 +178,7 @@ public class MainPresenter extends BasePresenter<MainPresenter.View>
     private FollowObserver followObserver = new FollowObserver();
     private UnFollowObserver unFollowObserver= new UnFollowObserver();
     private LogoutObserver logoutObserver = new LogoutObserver();
-    private PostStatusObserver postStatusObserver = new PostStatusObserver();
+    private StatusService.PostStatusObserver postStatusObserver;// = new PostStatusObserver();
     private FollowingCountObserver followingCountObserver = new FollowingCountObserver();
     private FollowerCountObserver followerCountObserver = new FollowerCountObserver();
     private CheckFollowObserver checkFollowObserver = new CheckFollowObserver();
@@ -197,6 +197,11 @@ public class MainPresenter extends BasePresenter<MainPresenter.View>
         void onUnfollow();
 
         void onStatusPost(String message);
+    }
+
+    public StatusService.PostStatusObserver getPostStatusObserver()
+    {
+        return new PostStatusObserver();
     }
 
     private AuthToken authToken;
@@ -270,6 +275,10 @@ public class MainPresenter extends BasePresenter<MainPresenter.View>
 
     public void postStatus(String post)
     {
+        if(postStatusObserver == null)
+        {
+            postStatusObserver = getPostStatusObserver();
+        }
         try
         {
             view.displayInfoMessage("Posting Status...");
@@ -287,7 +296,7 @@ public class MainPresenter extends BasePresenter<MainPresenter.View>
         return new StatusService();
     }
 
-    private String getFormattedDateTime() throws ParseException
+    public String getFormattedDateTime() throws ParseException
     {
         SimpleDateFormat userFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         SimpleDateFormat statusFormat = new SimpleDateFormat("MMM d yyyy h:mm aaa");

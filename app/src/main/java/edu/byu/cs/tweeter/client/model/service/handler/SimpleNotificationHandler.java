@@ -1,5 +1,6 @@
 package edu.byu.cs.tweeter.client.model.service.handler;
 
+import android.os.Looper;
 import android.os.Message;
 
 import edu.byu.cs.tweeter.client.model.service.observer.ServiceObserver;
@@ -11,6 +12,11 @@ public abstract class SimpleNotificationHandler<T extends SimpleNotificationObse
     {
         super(observer);
     }
+
+//    protected SimpleNotificationHandler(Looper looper, T observer)
+//    {
+//        super(looper, observer);
+//    }
 
     @Override
     protected void handleSuccessMessage(T observer, Message msg)

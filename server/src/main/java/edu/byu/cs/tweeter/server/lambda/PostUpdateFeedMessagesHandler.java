@@ -6,6 +6,7 @@ import com.amazonaws.services.lambda.runtime.events.SQSEvent;
 
 import edu.byu.cs.tweeter.model.net.request.PostStatusRequest;
 import edu.byu.cs.tweeter.server.dao.DynamoDAOFactory;
+import edu.byu.cs.tweeter.server.service.FollowService;
 import edu.byu.cs.tweeter.server.service.StatusService;
 import edu.byu.cs.tweeter.util.JsonSerializer;
 
@@ -15,12 +16,12 @@ public class PostUpdateFeedMessagesHandler implements RequestHandler<SQSEvent, V
     @Override
     public Void handleRequest(SQSEvent event, Context context)
     {
-        StatusService statusService = new StatusService(new DynamoDAOFactory());
+        FollowService followService = new FollowService(new DynamoDAOFactory());
 
         for (SQSEvent.SQSMessage msg : event.getRecords())
         {
             PostStatusRequest request = JsonSerializer.deserialize(msg.getBody(), PostStatusRequest.class);
-            statusService.generateFeedMessages(request.getStatus());
+            followService.generateFeedMessages(request.getStatus());
         }
 
 //        StatusService statusService = new StatusService(new DynamoDAOFactory());

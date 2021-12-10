@@ -1,6 +1,7 @@
 package edu.byu.cs.tweeter.client.model.service;
 
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.widget.Toast;
 
@@ -28,6 +29,10 @@ import edu.byu.cs.tweeter.model.domain.User;
 
 public class StatusService extends BaseService
 {
+    public StatusService()
+    {
+    }
+
     public interface GetFeedObserver
     {
         void getFeedSuccess(List<Status> feed, boolean hasMorePages, Status lastStatus);

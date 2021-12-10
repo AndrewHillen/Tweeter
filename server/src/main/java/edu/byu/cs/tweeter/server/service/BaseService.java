@@ -38,6 +38,10 @@ public class BaseService
     protected DatabaseFactory databaseFactory;
     protected AuthTokenDAO authTokenDAO;
 
+    public BaseService()
+    {
+    }
+
     public BaseService(DatabaseFactory databaseFactory)
     {
         this.databaseFactory = databaseFactory;

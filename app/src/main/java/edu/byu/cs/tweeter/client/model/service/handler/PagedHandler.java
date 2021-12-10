@@ -1,5 +1,6 @@
 package edu.byu.cs.tweeter.client.model.service.handler;
 
+import android.os.Looper;
 import android.os.Message;
 
 import java.util.List;
@@ -14,6 +15,11 @@ public abstract class PagedHandler<T extends PagedObserver, U> extends Backgroun
     {
         super(observer);
     }
+
+//    public PagedHandler(Looper looper, T observer)
+//    {
+//        super(looper, observer);
+//    }
 
     @Override
     protected void handleSuccessMessage(T observer, Message msg)

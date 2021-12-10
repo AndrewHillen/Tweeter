@@ -1,7 +1,12 @@
 package edu.byu.cs.tweeter.server.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import edu.byu.cs.tweeter.model.domain.Status;
 import edu.byu.cs.tweeter.model.domain.User;
 import edu.byu.cs.tweeter.model.net.request.CheckFollowRequest;
+import edu.byu.cs.tweeter.model.net.request.FeedBatch;
 import edu.byu.cs.tweeter.model.net.request.FollowRequest;
 import edu.byu.cs.tweeter.model.net.request.GetFollowerCountRequest;
 import edu.byu.cs.tweeter.model.net.request.GetFollowersRequest;
@@ -15,7 +20,9 @@ import edu.byu.cs.tweeter.model.net.response.GetFollowersResponse;
 import edu.byu.cs.tweeter.model.net.response.GetFollowingCountResponse;
 import edu.byu.cs.tweeter.model.net.response.GetFollowingResponse;
 import edu.byu.cs.tweeter.model.net.response.UnFollowResponse;
+import edu.byu.cs.tweeter.server.SQS.SQSUtil;
 import edu.byu.cs.tweeter.server.dao.FollowDAODynamo;
+import edu.byu.cs.tweeter.util.JsonSerializer;
 
 /**
  * Contains the business logic for getting the users a user is following.
@@ -24,6 +31,8 @@ public class FollowService extends BaseService {
 
     FollowDAO followDAO;
     UserDAO userDAO;
+
+    private String UPDATE_FEED_QUEUE = "https://sqs.us-west-2.amazonaws.com/366733358874/UpdateFeedQueue";
 
     public FollowService(DatabaseFactory databaseFactory)
     {
@@ -89,6 +98,51 @@ public class FollowService extends BaseService {
     public CheckFollowResponse checkFollow(CheckFollowRequest request)
     {
         return getFollowingDAO().checkFollow(request);
+    }
+
+
+    public void generateFeedMessages(Status status)
+    {
+        System.out.println();
+        String alias = status.getUser().getAlias();
+        int limit = 25;
+        User lastUser = null;
+        boolean keepGoing = true;
+
+        while(keepGoing)
+        {
+            GetFollowersResponse getFollowersResponse = getFollowingDAO().getFollowers(alias, lastUser, limit);
+            List<User> users = getFollowersResponse.getItems();
+            List<String> aliases = new ArrayList<>();
+
+            for(User user : users)
+            {
+                aliases.add(user.getAlias());
+            }
+            if(users.size() > 0)
+            {
+                lastUser = users.get(users.size() - 1);
+                keepGoing = getFollowersResponse.getHasMorePages();
+            }
+            else
+            {
+                lastUser = null;
+                keepGoing = false;
+            }
+
+
+            FeedBatch feedBatch = new FeedBatch(aliases, status);
+            String messageBody = JsonSerializer.serialize(feedBatch);
+
+            SQSUtil SQS = new SQSUtil();
+
+            SQS.sendToQueue(UPDATE_FEED_QUEUE, messageBody);
+            //Send users to next part
+//            for(User user : users)
+//            {
+//                getFeedDao().addToFeed(status, user.getAlias(), status.getTimestamp());
+//            }
+        }
     }
 
     /**

@@ -27,6 +27,11 @@ public class StatusService extends BaseService
     private String FEED_MESSAGES_QUEUE = "https://sqs.us-west-2.amazonaws.com/366733358874/PostStatusQueue";
     private String UPDATE_FEED_QUEUE = "https://sqs.us-west-2.amazonaws.com/366733358874/UpdateFeedQueue";
 
+    public StatusService()
+    {
+        super();
+    }
+
     public StatusService(DatabaseFactory databaseFactory)
     {
         super(databaseFactory);
@@ -56,49 +61,49 @@ public class StatusService extends BaseService
         return new PostStatusResponse(true);
     }
 
-    public void generateFeedMessages(Status status)
-    {
-        System.out.println();
-        String alias = status.getUser().getAlias();
-        int limit = 25;
-        User lastUser = null;
-        boolean keepGoing = true;
-
-        while(keepGoing)
-        {
-            GetFollowersResponse getFollowersResponse = getFollowingDAO().getFollowers(alias, lastUser, limit);
-            List<User> users = getFollowersResponse.getItems();
-            List<String> aliases = new ArrayList<>();
-
-            for(User user : users)
-            {
-                aliases.add(user.getAlias());
-            }
-            if(users.size() > 0)
-            {
-                lastUser = users.get(users.size() - 1);
-                keepGoing = getFollowersResponse.getHasMorePages();
-            }
-            else
-            {
-                lastUser = null;
-                keepGoing = false;
-            }
-
-
-            FeedBatch feedBatch = new FeedBatch(aliases, status);
-            String messageBody = JsonSerializer.serialize(feedBatch);
-
-            SQSUtil SQS = new SQSUtil();
-
-            SQS.sendToQueue(UPDATE_FEED_QUEUE, messageBody);
-            //Send users to next part
+//    public void generateFeedMessages(Status status)
+//    {
+//        System.out.println();
+//        String alias = status.getUser().getAlias();
+//        int limit = 25;
+//        User lastUser = null;
+//        boolean keepGoing = true;
+//
+//        while(keepGoing)
+//        {
+//            GetFollowersResponse getFollowersResponse = getFollowingDAO().getFollowers(alias, lastUser, limit);
+//            List<User> users = getFollowersResponse.getItems();
+//            List<String> aliases = new ArrayList<>();
+//
 //            for(User user : users)
 //            {
-//                getFeedDao().addToFeed(status, user.getAlias(), status.getTimestamp());
+//                aliases.add(user.getAlias());
 //            }
-        }
-    }
+//            if(users.size() > 0)
+//            {
+//                lastUser = users.get(users.size() - 1);
+//                keepGoing = getFollowersResponse.getHasMorePages();
+//            }
+//            else
+//            {
+//                lastUser = null;
+//                keepGoing = false;
+//            }
+//
+//
+//            FeedBatch feedBatch = new FeedBatch(aliases, status);
+//            String messageBody = JsonSerializer.serialize(feedBatch);
+//
+//            SQSUtil SQS = new SQSUtil();
+//
+//            SQS.sendToQueue(UPDATE_FEED_QUEUE, messageBody);
+//            //Send users to next part
+////            for(User user : users)
+////            {
+////                getFeedDao().addToFeed(status, user.getAlias(), status.getTimestamp());
+////            }
+//        }
+//    }
 
     public void postToFeeds(FeedBatch feedBatch)
     {

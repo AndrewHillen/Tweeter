@@ -7,6 +7,10 @@ import edu.byu.cs.tweeter.client.backgroundTask.BackgroundTask;
 
 public class BaseService
 {
+    public BaseService()
+    {
+    }
+
     protected <T extends BackgroundTask> void executeTask(T task)
     {
         ExecutorService executor = Executors.newSingleThreadExecutor();
